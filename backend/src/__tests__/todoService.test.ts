@@ -1,16 +1,23 @@
+import jwt from 'jsonwebtoken';
 import request from 'supertest';
-import app from '../index';
-import { TodoService } from '../services/todoService';
+import app from '@/index';
+import { TodoService } from '@/services/todoService';
 import { Todo } from '@/types/todo';
 
 jest.mock('../services/todoService');
 
 describe('Todo API Endpoints', () => {
     let mockTodo: Todo;
+    let authToken: string;
     const mockTimestamp = Date.now();
 
     beforeEach(() => {
         jest.clearAllMocks();
+
+        authToken = jwt.sign(
+            { userId: 'test-user-id' },
+            process.env.JWT_SECRET || 'your-secret-key'
+        );
 
         mockTodo = {
             id: '1',
@@ -26,7 +33,9 @@ describe('Todo API Endpoints', () => {
             const mockTodos = [mockTodo];
             (TodoService.prototype.getAllTodos as jest.Mock).mockResolvedValue(mockTodos);
 
-            const response = await request(app).get('/api/todos');
+            const response = await request(app)
+                .get('/api/todos')
+                .set('Authorization', `Bearer ${authToken}`);
 
             expect(response.status).toBe(200);
             expect(response.body).toEqual(mockTodos);
@@ -35,7 +44,9 @@ describe('Todo API Endpoints', () => {
         it('should handle errors when fetching todos', async () => {
             (TodoService.prototype.getAllTodos as jest.Mock).mockRejectedValue(new Error('Database error'));
 
-            const response = await request(app).get('/api/todos');
+            const response = await request(app)
+                .get('/api/todos')
+                .set('Authorization', `Bearer ${authToken}`);
 
             expect(response.status).toBe(500);
             expect(response.body).toEqual({ error: 'Failed to fetch todos' });
@@ -48,6 +59,7 @@ describe('Todo API Endpoints', () => {
 
             const response = await request(app)
                 .post('/api/todos')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send({ title: 'Test Todo' });
 
             expect(response.status).toBe(201);
@@ -57,6 +69,7 @@ describe('Todo API Endpoints', () => {
         it('should return 400 if title is missing', async () => {
             const response = await request(app)
                 .post('/api/todos')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send({});
 
             expect(response.status).toBe(400);
@@ -68,6 +81,7 @@ describe('Todo API Endpoints', () => {
 
             const response = await request(app)
                 .post('/api/todos')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send({ title: 'Test Todo' });
 
             expect(response.status).toBe(500);
@@ -82,6 +96,7 @@ describe('Todo API Endpoints', () => {
 
             const response = await request(app)
                 .put('/api/todos/1')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send({ title: 'Updated Todo' });
 
             expect(response.status).toBe(200);
@@ -93,6 +108,7 @@ describe('Todo API Endpoints', () => {
 
             const response = await request(app)
                 .put('/api/todos/999')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send({ title: 'Updated Todo' });
 
             expect(response.status).toBe(404);
@@ -107,6 +123,7 @@ describe('Todo API Endpoints', () => {
 
             const response = await request(app)
                 .patch('/api/todos/1/toggle')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send({ completed: true });
 
             expect(response.status).toBe(200);
@@ -118,6 +135,7 @@ describe('Todo API Endpoints', () => {
 
             const response = await request(app)
                 .patch('/api/todos/999/toggle')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send({ completed: true });
 
             expect(response.status).toBe(404);
@@ -129,7 +147,9 @@ describe('Todo API Endpoints', () => {
         it('should delete a todo', async () => {
             (TodoService.prototype.deleteTodo as jest.Mock).mockResolvedValue(true);
 
-            const response = await request(app).delete('/api/todos/1');
+            const response = await request(app)
+                .delete('/api/todos/1')
+                .set('Authorization', `Bearer ${authToken}`);
 
             expect(response.status).toBe(204);
         });
@@ -137,10 +157,29 @@ describe('Todo API Endpoints', () => {
         it('should return 404 if todo not found', async () => {
             (TodoService.prototype.deleteTodo as jest.Mock).mockResolvedValue(false);
 
-            const response = await request(app).delete('/api/todos/999');
+            const response = await request(app)
+                .delete('/api/todos/999')
+                .set('Authorization', `Bearer ${authToken}`);
 
             expect(response.status).toBe(404);
             expect(response.body).toEqual({ error: 'Todo not found' });
+        });
+    });
+
+    describe('Authentication', () => {
+        it('should return 401 when no token is provided', async () => {
+            const response = await request(app).get('/api/todos');
+            expect(response.status).toBe(401);
+            expect(response.body).toEqual({ error: 'Authorization header missing' });
+        });
+
+        it('should return 401 when invalid token is provided', async () => {
+            const response = await request(app)
+                .get('/api/todos')
+                .set('Authorization', 'Bearer invalid-token');
+
+            expect(response.status).toBe(401);
+            expect(response.body).toEqual({ error: 'Invalid token' });
         });
     });
 });

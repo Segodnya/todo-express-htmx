@@ -1,20 +1,20 @@
 import express, { Express } from 'express';
 import dotenv from 'dotenv';
-import { TodoController } from '@controllers/todoController';
+import { UserController } from '@controllers/userController';
+import todoRoutes from '@routes/todoRoutes';
 
 dotenv.config();
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
-const todoController = new TodoController();
+const userController = new UserController();
 
 app.use(express.json());
 
-app.get('/api/todos', todoController.getAllTodos);
-app.post('/api/todos', todoController.createTodo);
-app.put('/api/todos/:id', todoController.updateTodo);
-app.patch('/api/todos/:id/toggle', todoController.toggleTodo);
-app.delete('/api/todos/:id', todoController.deleteTodo);
+app.post('/api/users/register', userController.register);
+app.post('/api/users/login', userController.login);
+
+app.use('/api/todos', todoRoutes);
 
 if (process.env.NODE_ENV !== 'test') {
   app.listen(port, () => {

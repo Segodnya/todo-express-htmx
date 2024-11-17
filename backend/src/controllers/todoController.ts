@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express';
-import { TodoService } from '../services/todoService';
+import { TodoService } from '@/services/todoService';
 
 const todoService = new TodoService();
 
