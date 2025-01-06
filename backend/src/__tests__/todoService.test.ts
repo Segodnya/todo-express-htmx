@@ -9,18 +9,20 @@ jest.mock('../services/todoService');
 describe('Todo API Endpoints', () => {
     let mockTodo: Todo;
     let authToken: string;
+    const mockUserId = 'test-user-id';
     const mockTimestamp = Date.now();
 
     beforeEach(() => {
         jest.clearAllMocks();
 
         authToken = jwt.sign(
-            { userId: 'test-user-id' },
+            { userId: mockUserId },
             process.env.JWT_SECRET || 'your-secret-key'
         );
 
         mockTodo = {
             id: '1',
+            userId: mockUserId,
             title: 'Test Todo',
             completed: false,
             createdAt: mockTimestamp,
@@ -29,7 +31,7 @@ describe('Todo API Endpoints', () => {
     });
 
     describe('GET /api/todos', () => {
-        it('should return all todos', async () => {
+        it('should return user-specific todos', async () => {
             const mockTodos = [mockTodo];
             (TodoService.prototype.getAllTodos as jest.Mock).mockResolvedValue(mockTodos);
 
@@ -39,6 +41,7 @@ describe('Todo API Endpoints', () => {
 
             expect(response.status).toBe(200);
             expect(response.body).toEqual(mockTodos);
+            expect(TodoService.prototype.getAllTodos).toHaveBeenCalledWith(mockUserId);
         });
 
         it('should handle errors when fetching todos', async () => {
@@ -54,7 +57,7 @@ describe('Todo API Endpoints', () => {
     });
 
     describe('POST /api/todos', () => {
-        it('should create a new todo', async () => {
+        it('should create a new todo for specific user', async () => {
             (TodoService.prototype.createTodo as jest.Mock).mockResolvedValue(mockTodo);
 
             const response = await request(app)
@@ -64,6 +67,7 @@ describe('Todo API Endpoints', () => {
 
             expect(response.status).toBe(201);
             expect(response.body).toEqual(mockTodo);
+            expect(TodoService.prototype.createTodo).toHaveBeenCalledWith('Test Todo', mockUserId);
         });
 
         it('should return 400 if title is missing', async () => {

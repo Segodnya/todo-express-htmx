@@ -14,15 +14,17 @@ export class TodoService {
         }
     }
 
-    async getAllTodos(): Promise<Todo[]> {
+    async getAllTodos(userId: string): Promise<Todo[]> {
         await this.ensureFileExists();
         const data = await fs.readFile(TODO_FILE_PATH, 'utf-8');
         const todos = JSON.parse(data);
-        return todos.map((todo: Todo) => ({
-            ...todo,
-            createdAt: new Date(todo.createdAt),
-            updatedAt: new Date(todo.updatedAt)
-        }));
+        return todos
+            .filter((todo: Todo) => todo.userId === userId)
+            .map((todo: Todo) => ({
+                ...todo,
+                createdAt: new Date(todo.createdAt),
+                updatedAt: new Date(todo.updatedAt)
+            }));
     }
 
     async saveTodos(todos: Todo[]): Promise<void> {
@@ -30,41 +32,50 @@ export class TodoService {
         await fs.writeFile(TODO_FILE_PATH, JSON.stringify(todos, null, 2));
     }
 
-    async createTodo(title: string): Promise<Todo> {
-        const todos = await this.getAllTodos();
+    async createTodo(title: string, userId: string): Promise<Todo> {
+        const todos = await this.getAllTodos(userId);
         const now = Date.now();
         const newTodo: Todo = {
             id: now.toString(),
+            userId,
             title,
             completed: false,
             createdAt: now,
             updatedAt: now,
         };
-        todos.push(newTodo);
-        await this.saveTodos(todos);
+        
+        const allTodos = JSON.parse(await fs.readFile(TODO_FILE_PATH, 'utf-8'));
+        allTodos.push(newTodo);
+        await this.saveTodos(allTodos);
         return newTodo;
     }
 
-    async updateTodo(id: string, updates: Partial<Todo>): Promise<Todo | null> {
-        const todos = await this.getAllTodos();
-        const todoIndex = todos.findIndex(todo => todo.id === id);
+    async updateTodo(id: string, userId: string, updates: Partial<Todo>): Promise<Todo | null> {
+        const allTodos = JSON.parse(await fs.readFile(TODO_FILE_PATH, 'utf-8'));
+        const todoIndex = allTodos.findIndex(
+            (todo: Todo) => todo.id === id && todo.userId === userId
+        );
+        
         if (todoIndex === -1) return null;
 
         const updatedTodo = {
-            ...todos[todoIndex],
+            ...allTodos[todoIndex],
             ...updates,
+            userId,
             updatedAt: Date.now()
         };
-        todos[todoIndex] = updatedTodo;
+        allTodos[todoIndex] = updatedTodo;
 
-        await this.saveTodos(todos);
+        await this.saveTodos(allTodos);
         return updatedTodo;
     }
 
-    async deleteTodo(id: string): Promise<boolean> {
-        const todos = await this.getAllTodos();
-        const initialLength = todos.length;
-        const filteredTodos = todos.filter(todo => todo.id !== id);
+    async deleteTodo(id: string, userId: string): Promise<boolean> {
+        const allTodos = JSON.parse(await fs.readFile(TODO_FILE_PATH, 'utf-8'));
+        const initialLength = allTodos.length;
+        const filteredTodos = allTodos.filter(
+            (todo: Todo) => !(todo.id === id && todo.userId === userId)
+        );
 
         if (filteredTodos.length === initialLength) return false;
 

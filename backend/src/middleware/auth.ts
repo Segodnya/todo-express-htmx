@@ -1,27 +1,35 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { AuthMiddleware, AuthenticatedRequest } from '@/types/express';
 
-export interface AuthRequest extends Request {
-    userId?: string;
-}
-
-export const authMiddleware = (req: AuthRequest, res: Response, next: NextFunction) => {
+export const authMiddleware: AuthMiddleware = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
     const authHeader = req.headers.authorization;
-
     if (!authHeader) {
-        return res.status(401).json({ error: 'Authorization header missing' });
+      res.status(401).json({ error: 'Authorization header missing' });
+      return;
     }
 
-    const token = authHeader.split(' ')[1];
-    if (!token) {
-        return res.status(401).json({ error: 'Token missing' });
-    }
+    const token = authHeader.replace('Bearer ', '');
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || 'your-secret-key'
+    ) as {
+      userId: string;
+      email: string;
+    };
 
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as { userId: string };
-        req.userId = decoded.userId;
-        next();
-    } catch (error) {
-        res.status(401).json({ error: 'Invalid token' });
-    }
+    (req as AuthenticatedRequest).user = {
+      userId: decoded.userId,
+      email: decoded.email,
+    };
+
+    next();
+  } catch (error) {
+    res.status(401).json({ error: 'Invalid token' });
+  }
 };
