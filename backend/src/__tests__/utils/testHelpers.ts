@@ -90,6 +90,9 @@ export const createMockResponse = (): Partial<Response> => {
   res.json = jest.fn().mockReturnValue(res);
   res.render = jest.fn().mockReturnValue(res);
   res.redirect = jest.fn().mockReturnValue(res);
+  res.header = jest.fn().mockReturnValue(res);
+  res.setHeader = jest.fn().mockReturnValue(res);
+  res.end = jest.fn().mockReturnValue(res);
 
   return res;
 };

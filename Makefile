@@ -26,3 +26,6 @@ start:
 knip:
 	cd backend && npm run knip
 	cd frontend && npm run knip
+
+test:
+	cd backend && npm run test:coverage

@@ -22,10 +22,10 @@ export interface AuthenticatedRequest extends Request {
 }
 
 export type AuthRequestHandler<
-  P = any,
-  ResBody = any,
-  ReqBody = any,
-  ReqQuery = any
+  P = Record<string, string>,
+  ResBody = unknown,
+  ReqBody = unknown,
+  ReqQuery = Record<string, string | string[]>
 > = RequestHandler<
   P,
   ResBody,

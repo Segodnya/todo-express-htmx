@@ -46,7 +46,7 @@ app.set('layout extractStyles', true);
 app.set('layout extractMetas', true);
 
 interface ContentOptions {
-  fn: (context: any) => string;
+  fn: (context: Record<string, unknown>) => string;
 }
 
 app.locals.defineContent = function (name: string, options: ContentOptions) {

@@ -21,8 +21,9 @@ export class TodoController extends BaseController {
 
   createTodo: AuthRequestHandler = async (req, res) => {
     await this.handleRequest(req, res, async () => {
-      const { text } = req.body;
       const { user } = req as AuthenticatedRequest;
+      // Type assertion for req.body
+      const { text } = req.body as { text: string };
 
       if (!text) {
         return this.handleValidationError(res, 'Title is required');
@@ -31,7 +32,7 @@ export class TodoController extends BaseController {
       const todoData: TodoCreateDTO = {
         text,
         userId: user.userId,
-        completed: false
+        completed: false,
       };
 
       const todo = await this.todoService.createTodo(todoData);
@@ -42,8 +43,9 @@ export class TodoController extends BaseController {
   updateTodo: AuthRequestHandler = async (req, res) => {
     await this.handleRequest(req, res, async () => {
       const { id } = req.params;
-      const updates: TodoUpdateDTO = req.body;
       const { user } = req as AuthenticatedRequest;
+      // Type assertion for req.body
+      const updates = req.body as TodoUpdateDTO;
 
       const todo = await this.todoService.updateTodo(id, user.userId, updates);
 
@@ -83,4 +85,4 @@ export class TodoController extends BaseController {
       res.send(''); // Empty response as the element will be removed by HTMX
     });
   };
-} 
+}

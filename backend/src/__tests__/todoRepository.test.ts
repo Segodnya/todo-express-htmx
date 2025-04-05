@@ -1,11 +1,7 @@
-/**
- * @todo
- */
-//@ts-nocheck
-
 import { ITodoRepository } from '@/repositories';
 import { TodoEntity, TodoCreateDTO, TodoUpdateDTO } from '@/types';
 import { createMockId } from './utils/testHelpers';
+import fs from 'fs';
 
 /**
  * Type-safe TodoRepository tests with in-memory database mock.
@@ -17,14 +13,36 @@ class InMemoryTodoRepository implements ITodoRepository {
   // Make it protected so we can access it in tests via type assertion
   protected todos: Map<string, TodoEntity> = new Map();
 
-  async findAll(userId: string): Promise<TodoEntity[]> {
-    return Array.from(this.todos.values()).filter(
-      (todo) => todo.userId === userId
-    );
+  async findAll(filter?: Partial<TodoEntity>): Promise<TodoEntity[]> {
+    const allTodos = Array.from(this.todos.values());
+
+    if (!filter) {
+      return allTodos;
+    }
+
+    return allTodos.filter((todo) => {
+      return Object.entries(filter).every(([key, value]) => {
+        return todo[key as keyof TodoEntity] === value;
+      });
+    });
   }
 
-  async findOne(id: string): Promise<TodoEntity | null> {
+  async findById(id: string): Promise<TodoEntity | null> {
     return this.todos.get(id) || null;
+  }
+
+  async findOne(filter: Partial<TodoEntity>): Promise<TodoEntity | null> {
+    const todo = Array.from(this.todos.values()).find((todo) => {
+      return Object.entries(filter).every(([key, value]) => {
+        return todo[key as keyof TodoEntity] === value;
+      });
+    });
+
+    return todo || null;
+  }
+
+  async findByUserId(userId: string): Promise<TodoEntity[]> {
+    return this.findAll({ userId });
   }
 
   async create(todoData: TodoCreateDTO): Promise<TodoEntity> {
@@ -119,7 +137,7 @@ describe('TodoRepository', () => {
   describe('findAll', () => {
     it('should return all todos for a specific user', async () => {
       // Act
-      const todos = await todoRepository.findAll(mockUserId);
+      const todos = await todoRepository.findByUserId(mockUserId);
 
       // Assert
       expect(todos).toHaveLength(2);
@@ -128,7 +146,7 @@ describe('TodoRepository', () => {
 
     it('should return an empty array if no todos exist for user', async () => {
       // Act
-      const todos = await todoRepository.findAll('non-existent-user');
+      const todos = await todoRepository.findByUserId('non-existent-user');
 
       // Assert
       expect(todos).toHaveLength(0);
@@ -141,7 +159,7 @@ describe('TodoRepository', () => {
       const targetTodo = sampleTodos[0];
 
       // Act
-      const todo = await todoRepository.findOne(targetTodo.id);
+      const todo = await todoRepository.findById(targetTodo.id);
 
       // Assert
       expect(todo).not.toBeNull();
@@ -151,7 +169,7 @@ describe('TodoRepository', () => {
 
     it('should return null if todo does not exist', async () => {
       // Act
-      const todo = await todoRepository.findOne('non-existent-id');
+      const todo = await todoRepository.findById('non-existent-id');
 
       // Assert
       expect(todo).toBeNull();
@@ -177,7 +195,7 @@ describe('TodoRepository', () => {
       expect(createdTodo.updatedAt).toBeDefined();
 
       // Verify it was added to the repository
-      const storedTodo = await todoRepository.findOne(createdTodo.id);
+      const storedTodo = await todoRepository.findById(createdTodo.id);
       expect(storedTodo).toEqual(createdTodo);
     });
   });
@@ -191,19 +209,31 @@ describe('TodoRepository', () => {
         completed: true,
       };
 
-      // Act
-      const updatedTodo = await todoRepository.update(
-        targetTodo.id,
-        updateData
-      );
+      // Store the original Date.now
+      const originalNow = Date.now;
+      const updatedTimestamp = Date.now() + 1000;
 
-      // Assert
-      expect(updatedTodo).not.toBeNull();
-      expect(updatedTodo?.text).toBe(updateData.text);
-      expect(updatedTodo?.completed).toBe(updateData.completed);
-      expect(updatedTodo?.id).toBe(targetTodo.id);
-      expect(updatedTodo?.userId).toBe(targetTodo.userId);
-      expect(updatedTodo?.updatedAt).toBeGreaterThan(targetTodo.updatedAt);
+      try {
+        // Mock Date.now to return a fixed time
+        global.Date.now = jest.fn(() => updatedTimestamp);
+
+        // Act
+        const updatedTodo = await todoRepository.update(
+          targetTodo.id,
+          updateData
+        );
+
+        // Assert
+        expect(updatedTodo).not.toBeNull();
+        expect(updatedTodo?.text).toBe(updateData.text);
+        expect(updatedTodo?.completed).toBe(updateData.completed);
+        expect(updatedTodo?.id).toBe(targetTodo.id);
+        expect(updatedTodo?.userId).toBe(targetTodo.userId);
+        expect(updatedTodo?.updatedAt).toBe(updatedTimestamp);
+      } finally {
+        // Restore the original Date.now
+        global.Date.now = originalNow;
+      }
     });
 
     it('should return null if todo to update does not exist', async () => {
@@ -236,7 +266,7 @@ describe('TodoRepository', () => {
       expect(result).toBe(true);
 
       // Verify it was removed from the repository
-      const deletedTodo = await todoRepository.findOne(targetTodo.id);
+      const deletedTodo = await todoRepository.findById(targetTodo.id);
       expect(deletedTodo).toBeNull();
     });
 
