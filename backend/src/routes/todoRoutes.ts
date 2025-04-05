@@ -10,7 +10,7 @@ router.use(authMiddleware);
 router.get('/', todoController.getAllTodos);
 router.post('/', todoController.createTodo);
 router.put('/:id', todoController.updateTodo);
-router.patch('/:id/toggle', todoController.toggleTodo);
+router.put('/:id/toggle', todoController.toggleTodo);
 router.delete('/:id', todoController.deleteTodo);
 
 export default router;

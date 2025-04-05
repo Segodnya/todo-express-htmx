@@ -27,6 +27,19 @@ export class TodoService {
       }));
   }
 
+  async getTodo(id: string, userId: string): Promise<Todo | null> {
+    await this.ensureFileExists();
+    const data = await fs.readFile(TODO_FILE_PATH, 'utf-8');
+    const todos = JSON.parse(data);
+    const todo = todos.find((t: Todo) => t.id === id && t.userId === userId);
+    if (!todo) return null;
+    return {
+      ...todo,
+      createdAt: new Date(todo.createdAt),
+      updatedAt: new Date(todo.updatedAt),
+    };
+  }
+
   async saveTodos(todos: Todo[]): Promise<void> {
     await this.ensureFileExists();
     await fs.writeFile(TODO_FILE_PATH, JSON.stringify(todos, null, 2));
