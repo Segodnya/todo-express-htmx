@@ -1,10 +1,10 @@
-import { User } from "./user";
+import { User } from './user';
 
 export interface Todo {
-    id: string;
-    userId: User['id'];
-    title: string;
-    completed: boolean;
-    createdAt: number;
-    updatedAt: number;
+  id: string;
+  userId: User['id'];
+  text: string;
+  completed: boolean;
+  createdAt: number;
+  updatedAt: number;
 }

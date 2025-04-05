@@ -1,28 +1,27 @@
 import { Request, Response } from 'express';
-import { UserService } from '@/services/userService';
+import { userService } from '../services/userService';
 
 export class UserController {
-    private userService: UserService;
-
-    constructor() {
-        this.userService = new UserService();
+  async register(req: Request, res: Response) {
+    try {
+      const { email, password } = req.body;
+      const user = await userService.create(email, password);
+      res.status(201).json(user);
+    } catch (error) {
+      res.status(400).json({ error: 'Registration failed' });
     }
+  }
 
-    register = async (req: Request, res: Response): Promise<void> => {
-        try {
-            const user = await this.userService.createUser(req.body);
-            res.status(201).json(user);
-        } catch (error) {
-            res.status(400).json({ error: (error as Error).message });
-        }
-    };
-
-    login = async (req: Request, res: Response): Promise<void> => {
-        try {
-            const token = await this.userService.login(req.body);
-            res.json({ token });
-        } catch (error) {
-            res.status(401).json({ error: (error as Error).message });
-        }
-    };
+  async login(req: Request, res: Response) {
+    try {
+      const { email } = req.body;
+      const user = await userService.findByEmail(email);
+      if (!user) {
+        return res.status(401).json({ error: 'Invalid credentials' });
+      }
+      res.json(user);
+    } catch (error) {
+      res.status(400).json({ error: 'Login failed' });
+    }
+  }
 }

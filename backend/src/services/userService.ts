@@ -1,54 +1,34 @@
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import { User, UserCreateDTO, UserLoginDTO } from '@/types/user';
+import { User } from '../types/auth';
+import { FileStorage } from './fileStorage';
+
+interface StoredUser extends User {
+  id: string;
+  email: string;
+  password: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export class UserService {
-    private users: User[] = [];
+  private storage: FileStorage<StoredUser>;
 
-    async createUser(userDTO: UserCreateDTO): Promise<Omit<User, 'password'>> {
-        const existingUser = this.users.find(u => u.email === userDTO.email);
-        if (existingUser) {
-            throw new Error('User already exists');
-        }
+  constructor() {
+    this.storage = new FileStorage<StoredUser>('users');
+  }
 
-        const hashedPassword = await bcrypt.hash(userDTO.password, 10);
-        const newUser: User = {
-            id: Date.now().toString(),
-            email: userDTO.email,
-            name: userDTO.name,
-            password: hashedPassword
-        };
+  async findByEmail(email: string): Promise<StoredUser | null> {
+    return this.storage.findOne({ email });
+  }
 
-        this.users.push(newUser);
-        const { password, ...userWithoutPassword } = newUser;
-        return userWithoutPassword;
-    }
-
-    async login(credentials: UserLoginDTO): Promise<string> {
-        const user = this.users.find(u => u.email === credentials.email);
-        if (!user) {
-            throw new Error('Invalid credentials');
-        }
-
-        const isPasswordValid = await bcrypt.compare(credentials.password, user.password);
-        if (!isPasswordValid) {
-            throw new Error('Invalid credentials');
-        }
-
-        const token = jwt.sign(
-            { userId: user.id, email: user.email },
-            process.env.JWT_SECRET || 'your-secret-key',
-            { expiresIn: '24h' }
-        );
-
-        return token;
-    }
-
-    getUserById(id: string): Omit<User, 'password'> | null {
-        const user = this.users.find(u => u.id === id);
-        if (!user) return null;
-
-        const { password, ...userWithoutPassword } = user;
-        return userWithoutPassword;
-    }
+  async create(email: string, password: string): Promise<StoredUser> {
+    const now = new Date().toISOString();
+    return this.storage.create({
+      email,
+      password,
+      createdAt: now,
+      updatedAt: now,
+    });
+  }
 }
+
+export const userService = new UserService();

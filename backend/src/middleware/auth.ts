@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
 import { AuthMiddleware, AuthenticatedRequest } from '@/types/express';
 
 export const authMiddleware: AuthMiddleware = async (
@@ -8,28 +7,18 @@ export const authMiddleware: AuthMiddleware = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) {
-      res.status(401).json({ error: 'Authorization header missing' });
+    if (!req.session.user) {
+      res.status(401).json({ error: 'Unauthorized' });
       return;
     }
 
-    const token = authHeader.replace('Bearer ', '');
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET || 'your-secret-key'
-    ) as {
-      userId: string;
-      email: string;
-    };
-
     (req as AuthenticatedRequest).user = {
-      userId: decoded.userId,
-      email: decoded.email,
+      userId: req.session.user.id,
+      email: req.session.user.email,
     };
 
     next();
   } catch (error) {
-    res.status(401).json({ error: 'Invalid token' });
+    res.status(401).json({ error: 'Authentication failed' });
   }
 };

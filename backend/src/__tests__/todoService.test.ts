@@ -23,7 +23,7 @@ describe('Todo API Endpoints', () => {
         mockTodo = {
             id: '1',
             userId: mockUserId,
-            title: 'Test Todo',
+            text: 'Test Todo',
             completed: false,
             createdAt: mockTimestamp,
             updatedAt: mockTimestamp

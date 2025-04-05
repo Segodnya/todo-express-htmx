@@ -13,10 +13,16 @@ export type AuthRequestHandler<
   ResBody = any,
   ReqBody = any,
   ReqQuery = any
-> = RequestHandler<P, ResBody, ReqBody, ReqQuery, { user: AuthenticatedRequest['user'] }>;
+> = RequestHandler<
+  P,
+  ResBody,
+  ReqBody,
+  ReqQuery,
+  { user: AuthenticatedRequest['user'] }
+>;
 
 export type AuthMiddleware = (
   req: Request,
   res: Response,
   next: NextFunction
-) => Promise<void>; 
+) => Promise<void>;
