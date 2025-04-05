@@ -1,25 +1,28 @@
 copy_env:
 	cp .env.example .env
 
-# Install dependencies
 install:
 	cd backend && npm install
 	cd frontend && npm install
 
-# Start development server
-dev:
-	cd frontend && npm run build
-	cd backend && npm run dev
-
-# Build for production
-build:
+build-server:
 	cd backend && npm run build
 
-# Start production server
-start:
+build-client:
+	cd frontend && npm run build
+
+dev:
+	make build-client
+	cd backend && npm run dev
+
+start-server:
 	cd backend && npm start
 
-# Check for unused code
+start:
+	make build-client
+	make build-server
+	make start-server
+
 knip:
 	cd backend && npm run knip
 	cd frontend && npm run knip
