@@ -1,189 +1,269 @@
-import jwt from 'jsonwebtoken';
-import request from 'supertest';
-import app from '@/index';
-import { TodoService } from '@/services/todoService';
-import { Todo } from '@/types/todo';
+import { TodoService } from '@/services';
+import { ITodoRepository } from '@/repositories';
+import { TodoEntity, TodoCreateDTO, TodoUpdateDTO } from '@/types';
 
-jest.mock('../services/todoService');
+/**
+ * Type-safe TodoService tests with strongly typed mocks.
+ * Demonstrates how to properly test the service layer with mocked repositories.
+ */
 
-describe('Todo API Endpoints', () => {
-    let mockTodo: Todo;
-    let authToken: string;
-    const mockUserId = 'test-user-id';
-    const mockTimestamp = Date.now();
+describe('TodoService', () => {
+  let todoService: TodoService;
+  let mockRepository: jest.Mocked<ITodoRepository>;
 
-    beforeEach(() => {
-        jest.clearAllMocks();
+  const mockUserId = 'test-user-id';
+  const mockTimestamp = Date.now();
 
-        authToken = jwt.sign(
-            { userId: mockUserId },
-            process.env.JWT_SECRET || 'your-secret-key'
-        );
+  // Sample todo for testing
+  const mockTodo: TodoEntity = {
+    id: '1',
+    userId: mockUserId,
+    text: 'Test Todo',
+    completed: false,
+    createdAt: mockTimestamp,
+    updatedAt: mockTimestamp,
+  };
 
-        mockTodo = {
-            id: '1',
-            userId: mockUserId,
-            text: 'Test Todo',
-            completed: false,
-            createdAt: mockTimestamp,
-            updatedAt: mockTimestamp
-        };
+  beforeEach(() => {
+    // Create mock repository with jest functions
+    mockRepository = {
+      findAll: jest.fn(),
+      findById: jest.fn(),
+      findByUserId: jest.fn(),
+      findOne: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+    } as unknown as jest.Mocked<ITodoRepository>;
+
+    // Initialize the service with the mock repository
+    todoService = new TodoService(mockRepository);
+  });
+
+  describe('getAllTodosByUserId', () => {
+    it('should return all todos for a user', async () => {
+      // Arrange - Set up mock repo to return sample todos
+      mockRepository.findByUserId.mockResolvedValue([mockTodo]);
+
+      // Act
+      const result = await todoService.getAllTodosByUserId(mockUserId);
+
+      // Assert
+      expect(mockRepository.findByUserId).toHaveBeenCalledWith(mockUserId);
+      expect(result).toEqual([mockTodo]);
     });
 
-    describe('GET /api/todos', () => {
-        it('should return user-specific todos', async () => {
-            const mockTodos = [mockTodo];
-            (TodoService.prototype.getAllTodos as jest.Mock).mockResolvedValue(mockTodos);
+    it('should return empty array when no todos exist', async () => {
+      // Arrange
+      mockRepository.findByUserId.mockResolvedValue([]);
 
-            const response = await request(app)
-                .get('/api/todos')
-                .set('Authorization', `Bearer ${authToken}`);
+      // Act
+      const result = await todoService.getAllTodosByUserId(mockUserId);
 
-            expect(response.status).toBe(200);
-            expect(response.body).toEqual(mockTodos);
-            expect(TodoService.prototype.getAllTodos).toHaveBeenCalledWith(mockUserId);
-        });
+      // Assert
+      expect(mockRepository.findByUserId).toHaveBeenCalledWith(mockUserId);
+      expect(result).toEqual([]);
+    });
+  });
 
-        it('should handle errors when fetching todos', async () => {
-            (TodoService.prototype.getAllTodos as jest.Mock).mockRejectedValue(new Error('Database error'));
+  describe('createTodo', () => {
+    it('should create a new todo', async () => {
+      // Arrange
+      const todoData: TodoCreateDTO = {
+        userId: mockUserId,
+        text: 'New Todo',
+        completed: false,
+      };
 
-            const response = await request(app)
-                .get('/api/todos')
-                .set('Authorization', `Bearer ${authToken}`);
+      const createdTodo: TodoEntity = {
+        ...todoData,
+        id: '2',
+        createdAt: mockTimestamp,
+        updatedAt: mockTimestamp,
+      };
 
-            expect(response.status).toBe(500);
-            expect(response.body).toEqual({ error: 'Failed to fetch todos' });
-        });
+      mockRepository.create.mockResolvedValue(createdTodo);
+
+      // Act
+      const result = await todoService.createTodo(todoData);
+
+      // Assert
+      expect(mockRepository.create).toHaveBeenCalledWith(todoData);
+      expect(result).toEqual(createdTodo);
+    });
+  });
+
+  describe('updateTodo', () => {
+    it('should update an existing todo', async () => {
+      // Arrange
+      const todoId = '1';
+      const updateData: TodoUpdateDTO = {
+        text: 'Updated Todo',
+        completed: true,
+      };
+
+      const updatedTodo: TodoEntity = {
+        ...mockTodo,
+        ...updateData,
+        updatedAt: mockTimestamp + 1000, // Later timestamp
+      };
+
+      mockRepository.findOne.mockResolvedValue(mockTodo);
+      mockRepository.update.mockResolvedValue(updatedTodo);
+
+      // Act
+      const result = await todoService.updateTodo(
+        todoId,
+        mockUserId,
+        updateData
+      );
+
+      // Assert
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
+        id: todoId,
+        userId: mockUserId,
+      });
+      expect(mockRepository.update).toHaveBeenCalledWith(todoId, updateData);
+      expect(result).toEqual(updatedTodo);
     });
 
-    describe('POST /api/todos', () => {
-        it('should create a new todo for specific user', async () => {
-            (TodoService.prototype.createTodo as jest.Mock).mockResolvedValue(mockTodo);
+    it('should return null if todo to update does not exist', async () => {
+      // Arrange
+      const todoId = 'non-existent';
+      const updateData: TodoUpdateDTO = {
+        text: 'Updated Todo',
+        completed: true,
+      };
 
-            const response = await request(app)
-                .post('/api/todos')
-                .set('Authorization', `Bearer ${authToken}`)
-                .send({ title: 'Test Todo' });
+      mockRepository.findOne.mockResolvedValue(null);
 
-            expect(response.status).toBe(201);
-            expect(response.body).toEqual(mockTodo);
-            expect(TodoService.prototype.createTodo).toHaveBeenCalledWith('Test Todo', mockUserId);
-        });
+      // Act
+      const result = await todoService.updateTodo(
+        todoId,
+        mockUserId,
+        updateData
+      );
 
-        it('should return 400 if title is missing', async () => {
-            const response = await request(app)
-                .post('/api/todos')
-                .set('Authorization', `Bearer ${authToken}`)
-                .send({});
+      // Assert
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
+        id: todoId,
+        userId: mockUserId,
+      });
+      expect(mockRepository.update).not.toHaveBeenCalled();
+      expect(result).toBeNull();
+    });
+  });
 
-            expect(response.status).toBe(400);
-            expect(response.body).toEqual({ error: 'Title is required' });
-        });
+  describe('toggleTodoCompletion', () => {
+    it('should toggle todo completion status to true', async () => {
+      // Arrange
+      const todoId = '1';
+      const existingTodo = { ...mockTodo, completed: false };
 
-        it('should handle errors when creating todo', async () => {
-            (TodoService.prototype.createTodo as jest.Mock).mockRejectedValue(new Error('Database error'));
+      const updatedTodo = {
+        ...existingTodo,
+        completed: true,
+        updatedAt: mockTimestamp + 1000,
+      };
 
-            const response = await request(app)
-                .post('/api/todos')
-                .set('Authorization', `Bearer ${authToken}`)
-                .send({ title: 'Test Todo' });
+      mockRepository.findOne.mockResolvedValue(existingTodo);
+      mockRepository.update.mockResolvedValue(updatedTodo);
 
-            expect(response.status).toBe(500);
-            expect(response.body).toEqual({ error: 'Failed to create todo' });
-        });
+      // Act
+      const result = await todoService.toggleTodoCompletion(todoId, mockUserId);
+
+      // Assert
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
+        id: todoId,
+        userId: mockUserId,
+      });
+      expect(mockRepository.update).toHaveBeenCalledWith(todoId, {
+        completed: true,
+      });
+      expect(result).toEqual(updatedTodo);
     });
 
-    describe('PUT /api/todos/:id', () => {
-        it('should update a todo', async () => {
-            const updatedTodo = { ...mockTodo, title: 'Updated Todo' };
-            (TodoService.prototype.updateTodo as jest.Mock).mockResolvedValue(updatedTodo);
+    it('should toggle todo completion status to false', async () => {
+      // Arrange
+      const todoId = '1';
+      const existingTodo = { ...mockTodo, completed: true };
 
-            const response = await request(app)
-                .put('/api/todos/1')
-                .set('Authorization', `Bearer ${authToken}`)
-                .send({ title: 'Updated Todo' });
+      const updatedTodo = {
+        ...existingTodo,
+        completed: false,
+        updatedAt: mockTimestamp + 1000,
+      };
 
-            expect(response.status).toBe(200);
-            expect(response.body).toEqual(updatedTodo);
-        });
+      mockRepository.findOne.mockResolvedValue(existingTodo);
+      mockRepository.update.mockResolvedValue(updatedTodo);
 
-        it('should return 404 if todo not found', async () => {
-            (TodoService.prototype.updateTodo as jest.Mock).mockResolvedValue(null);
+      // Act
+      const result = await todoService.toggleTodoCompletion(todoId, mockUserId);
 
-            const response = await request(app)
-                .put('/api/todos/999')
-                .set('Authorization', `Bearer ${authToken}`)
-                .send({ title: 'Updated Todo' });
-
-            expect(response.status).toBe(404);
-            expect(response.body).toEqual({ error: 'Todo not found' });
-        });
+      // Assert
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
+        id: todoId,
+        userId: mockUserId,
+      });
+      expect(mockRepository.update).toHaveBeenCalledWith(todoId, {
+        completed: false,
+      });
+      expect(result).toEqual(updatedTodo);
     });
 
-    describe('PATCH /api/todos/:id/toggle', () => {
-        it('should toggle todo completion status', async () => {
-            const toggledTodo = { ...mockTodo, completed: true };
-            (TodoService.prototype.updateTodo as jest.Mock).mockResolvedValue(toggledTodo);
+    it('should return null if todo does not exist', async () => {
+      // Arrange
+      const todoId = 'non-existent';
 
-            const response = await request(app)
-                .patch('/api/todos/1/toggle')
-                .set('Authorization', `Bearer ${authToken}`)
-                .send({ completed: true });
+      mockRepository.findOne.mockResolvedValue(null);
 
-            expect(response.status).toBe(200);
-            expect(response.body).toEqual(toggledTodo);
-        });
+      // Act
+      const result = await todoService.toggleTodoCompletion(todoId, mockUserId);
 
-        it('should return 404 if todo not found', async () => {
-            (TodoService.prototype.updateTodo as jest.Mock).mockResolvedValue(null);
+      // Assert
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
+        id: todoId,
+        userId: mockUserId,
+      });
+      expect(mockRepository.update).not.toHaveBeenCalled();
+      expect(result).toBeNull();
+    });
+  });
 
-            const response = await request(app)
-                .patch('/api/todos/999/toggle')
-                .set('Authorization', `Bearer ${authToken}`)
-                .send({ completed: true });
+  describe('deleteTodo', () => {
+    it('should delete a todo and return true on success', async () => {
+      // Arrange
+      const todoId = '1';
+      mockRepository.findOne.mockResolvedValue(mockTodo);
+      mockRepository.delete.mockResolvedValue(true);
 
-            expect(response.status).toBe(404);
-            expect(response.body).toEqual({ error: 'Todo not found' });
-        });
+      // Act
+      const result = await todoService.deleteTodo(todoId, mockUserId);
+
+      // Assert
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
+        id: todoId,
+        userId: mockUserId,
+      });
+      expect(mockRepository.delete).toHaveBeenCalledWith(todoId);
+      expect(result).toBe(true);
     });
 
-    describe('DELETE /api/todos/:id', () => {
-        it('should delete a todo', async () => {
-            (TodoService.prototype.deleteTodo as jest.Mock).mockResolvedValue(true);
+    it('should return false if todo does not exist', async () => {
+      // Arrange
+      const todoId = 'non-existent';
+      mockRepository.findOne.mockResolvedValue(null);
 
-            const response = await request(app)
-                .delete('/api/todos/1')
-                .set('Authorization', `Bearer ${authToken}`);
+      // Act
+      const result = await todoService.deleteTodo(todoId, mockUserId);
 
-            expect(response.status).toBe(204);
-        });
-
-        it('should return 404 if todo not found', async () => {
-            (TodoService.prototype.deleteTodo as jest.Mock).mockResolvedValue(false);
-
-            const response = await request(app)
-                .delete('/api/todos/999')
-                .set('Authorization', `Bearer ${authToken}`);
-
-            expect(response.status).toBe(404);
-            expect(response.body).toEqual({ error: 'Todo not found' });
-        });
+      // Assert
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
+        id: todoId,
+        userId: mockUserId,
+      });
+      expect(mockRepository.delete).not.toHaveBeenCalled();
+      expect(result).toBe(false);
     });
-
-    describe('Authentication', () => {
-        it('should return 401 when no token is provided', async () => {
-            const response = await request(app).get('/api/todos');
-            expect(response.status).toBe(401);
-            expect(response.body).toEqual({ error: 'Authorization header missing' });
-        });
-
-        it('should return 401 when invalid token is provided', async () => {
-            const response = await request(app)
-                .get('/api/todos')
-                .set('Authorization', 'Bearer invalid-token');
-
-            expect(response.status).toBe(401);
-            expect(response.body).toEqual({ error: 'Invalid token' });
-        });
-    });
+  });
 });

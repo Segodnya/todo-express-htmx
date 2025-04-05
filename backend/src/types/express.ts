@@ -1,10 +1,23 @@
 import { Request, Response, RequestHandler, NextFunction } from 'express';
-import { User } from './user';
+
+// UserSession type used in our application
+export interface UserSession {
+  userId: string;
+  email: string;
+  name: string;
+}
+
+// Define session augmentation
+declare module 'express-session' {
+  interface SessionData {
+    user?: UserSession;
+  }
+}
 
 export interface AuthenticatedRequest extends Request {
   user: {
-    userId: User['id'];
-    email: User['email'];
+    userId: string;
+    email: string;
   };
 }
 
@@ -20,9 +33,3 @@ export type AuthRequestHandler<
   ReqQuery,
   { user: AuthenticatedRequest['user'] }
 >;
-
-export type AuthMiddleware = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => Promise<void>;

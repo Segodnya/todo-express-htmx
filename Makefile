@@ -4,6 +4,7 @@ copy_env:
 # Install dependencies
 install:
 	cd backend && npm install
+	cd frontend && npm install
 
 # Start development server
 dev:
@@ -17,3 +18,8 @@ build:
 # Start production server
 start:
 	cd backend && npm start
+
+# Check for unused code
+knip:
+	cd backend && npm run knip
+	cd frontend && npm run knip

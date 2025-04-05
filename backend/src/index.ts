@@ -3,12 +3,18 @@ import path from 'path';
 import dotenv from 'dotenv';
 import session from 'express-session';
 import expressLayouts from 'express-ejs-layouts';
-import authRoutes from './routes/authRoutes';
-import todoRoutes from './routes/todoRoutes';
 
 // Load environment variables
 dotenv.config();
 
+// Import dependencies
+import { createContainer } from './di';
+import { createTodoRouter, createAuthRouter } from './routes';
+
+// Initialize the dependency injection container
+const container = createContainer();
+
+// Initialize app
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -56,6 +62,10 @@ app.locals.getContent = function (name: string) {
 // Serve static files from the frontend/public directory
 app.use(express.static(path.join(__dirname, '../../frontend/public')));
 
+// Initialize routers
+const todoRouter = createTodoRouter(container.todoController);
+const authRouter = createAuthRouter(container.authController);
+
 // Auth middleware to protect routes
 const requireAuth = (
   req: express.Request,
@@ -69,8 +79,8 @@ const requireAuth = (
 };
 
 // Routes
-app.use('/auth', authRoutes);
-app.use('/todos', requireAuth, todoRoutes);
+app.use('/auth', authRouter);
+app.use('/todos', requireAuth, todoRouter);
 
 // Root route
 app.get('/', (req, res) => {
