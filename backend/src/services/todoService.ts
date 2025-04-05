@@ -2,7 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { Todo } from '@/types/todo';
 
-const TODO_FILE_PATH = path.join(__dirname, '../data/todos.json');
+const TODO_FILE_PATH = path.join(__dirname, '../../data/todos.json');
 
 export class TodoService {
   private async ensureFileExists(): Promise<void> {

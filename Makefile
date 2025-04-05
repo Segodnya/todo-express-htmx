@@ -7,6 +7,7 @@ install:
 
 # Start development server
 dev:
+	cd frontend && npm run build
 	cd backend && npm run dev
 
 # Build for production

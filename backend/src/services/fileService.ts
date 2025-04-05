@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-export class FileStorage<T extends { id: string }> {
+export class FileService<T extends { id: string }> {
   private filePath: string;
   private dataDir: string;
 

@@ -1,5 +1,5 @@
 import { User } from '../types/auth';
-import { FileStorage } from './fileStorage';
+import { FileService } from './fileService';
 
 interface StoredUser extends User {
   id: string;
@@ -10,10 +10,10 @@ interface StoredUser extends User {
 }
 
 export class UserService {
-  private storage: FileStorage<StoredUser>;
+  private storage: FileService<StoredUser>;
 
   constructor() {
-    this.storage = new FileStorage<StoredUser>('users');
+    this.storage = new FileService<StoredUser>('users');
   }
 
   async findByEmail(email: string): Promise<StoredUser | null> {

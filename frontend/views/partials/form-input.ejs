@@ -1,0 +1,48 @@
+<%# 
+  Params:
+  - id: Input id and name
+  - label: Label text (defaults to '')
+  - type: Input type (text, email, password, etc) (defaults to 'text')
+  - required: Whether the input is required (defaults to false)
+  - placeholder: Optional placeholder text
+  - Any other HTML attributes will be passed through
+%>
+<% 
+  // Set default values for optional parameters
+  const inputType = type || 'text';
+  const inputLabel = label || '';
+  const isRequired = typeof required !== 'undefined' ? required : false;
+  const inputPlaceholder = typeof placeholder !== 'undefined' ? placeholder : '';
+
+  // Filter out known props and non-string values to get remaining HTML attributes
+  const htmlAttrs = Object.entries(locals)
+    .filter(([key, value]) => (
+      !['id', 'label', 'type', 'required', 'placeholder', 'settings', '_locals'].includes(key) &&
+      typeof value !== 'object' &&
+      typeof value !== 'function'
+    ))
+    .reduce((acc, [key, value]) => {
+      acc[key] = value;
+      return acc;
+    }, {});
+%>
+<div>
+  <% if (inputLabel) { %>
+    <label for="<%= id %>" class="formLabel">
+      <%= inputLabel %>
+    </label>
+  <% } %>
+  <div class="<%= inputLabel ? 'mt-1' : '' %>">
+    <input 
+      id="<%= id %>" 
+      name="<%= id %>" 
+      type="<%= inputType %>" 
+      <% if (isRequired) { %>required<% } %>
+      <% if (inputPlaceholder) { %>placeholder="<%= inputPlaceholder %>"<% } %>
+      class="formInput"
+      <% Object.entries(htmlAttrs).forEach(([key, value]) => { %>
+        <%= key %>="<%= value %>"
+      <% }); %>
+    >
+  </div>
+</div> 
