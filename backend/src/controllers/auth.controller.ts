@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { BaseController } from './base.controller';
 import { AuthService } from '../services';
 import { UserCreateDTO, UserLoginDTO, UserSession } from '../types';
+import { ResponseUtils } from '../utils/responseUtils';
 
 export class AuthController extends BaseController {
   constructor(private authService: AuthService) {
@@ -37,7 +38,10 @@ export class AuthController extends BaseController {
 
       // Validation
       if (!email || !password) {
-        return this.handleValidationError(res, 'Email and password are required');
+        return this.handleValidationError(
+          res,
+          'Email and password are required'
+        );
       }
 
       const credentials: UserLoginDTO = { email, password };
@@ -99,7 +103,8 @@ export class AuthController extends BaseController {
       if (err) {
         console.error('Error destroying session:', err);
       }
-      res.redirect('/auth/signin');
+      // Use ResponseUtils to send a proper HTMX redirect
+      ResponseUtils.sendHtmxRedirect(res, '/auth/signin');
     });
   };
-} 
+}

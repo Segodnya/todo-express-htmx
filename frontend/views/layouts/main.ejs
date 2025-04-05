@@ -1,32 +1,11 @@
 <%- include('./header') %>
 
-<!-- Navigation -->
-<nav class="bg-white shadow">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-            <div class="flex">
-                <div class="flex-shrink-0 flex items-center">
-                    <h1 class="text-xl font-bold text-indigo-600">Todo App</h1>
-                </div>
-            </div>
-            <div class="flex items-center">
-                <% if (locals.user) { %>
-                    <span class="text-gray-700 mr-4"><%= user.email %></span>
-                    <form hx-post="/auth/signout" class="flex">
-                        <button type="submit" 
-                                class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            Sign Out
-                        </button>
-                    </form>
-                <% } %>
-            </div>
-        </div>
-    </div>
-</nav>
+<%- include('./nav') %>
 
 <!-- Main Content -->
 <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-    <%- body %>
+	<%- body %>
 </main>
 
-<%- include('./footer') %> 
+<%- include('./footer') %>
+
