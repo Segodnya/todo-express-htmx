@@ -2,6 +2,8 @@ import { UserService } from '@/services';
 import { IUserRepository } from '@/repositories';
 import { UserEntity, UserCreateDTO, UserLoginDTO } from '@/types';
 import bcrypt from 'bcrypt';
+import { defaultTestUser } from './utils/testHelpers';
+import { ThemeType, ThemeColor } from '@/utils/theme';
 
 // Mock bcrypt module
 jest.mock('bcrypt', () => ({
@@ -32,8 +34,11 @@ describe('UserService', () => {
     createdAt: mockTimestamp,
     updatedAt: mockTimestamp,
     settings: {
-      language: 'en'
-    }
+      language: 'en',
+      theme: {
+        type: 'system' as ThemeType,
+      },
+    },
   };
 
   beforeEach(() => {
@@ -88,8 +93,11 @@ describe('UserService', () => {
         name: 'New User',
         password: 'password123',
         settings: {
-          language: 'en'
-        }
+          language: 'en',
+          theme: {
+            type: 'system' as ThemeType,
+          },
+        },
       };
 
       const hashedPassword = 'hashed_password123';
@@ -117,6 +125,88 @@ describe('UserService', () => {
         password: hashedPassword,
       });
       expect(result).toEqual(createdUser);
+    });
+
+    it('should register a new user with theme preferences', async () => {
+      // Arrange
+      const userData: UserCreateDTO = {
+        email: 'new@example.com',
+        name: 'New User',
+        password: 'password123',
+        settings: {
+          language: 'en',
+          theme: {
+            type: 'dark' as ThemeType,
+          },
+        },
+      };
+
+      const hashedPassword = 'hashed_password123';
+
+      // Mock bcrypt hash to return our expected hashed password
+      (bcrypt.hash as jest.Mock).mockResolvedValueOnce(hashedPassword);
+
+      const createdUser: UserEntity = {
+        ...userData,
+        id: 'new-user-id',
+        password: hashedPassword,
+        createdAt: mockTimestamp,
+        updatedAt: mockTimestamp,
+      };
+
+      mockRepository.create.mockResolvedValue(createdUser);
+
+      // Act
+      const result = await userService.registerUser(userData);
+
+      // Assert
+      expect(mockRepository.create).toHaveBeenCalledWith({
+        ...userData,
+        password: hashedPassword,
+      });
+      expect(result.settings.theme.type).toBe('dark');
+    });
+
+    it('should register a new user with special theme color', async () => {
+      // Arrange
+      const userData: UserCreateDTO = {
+        email: 'new@example.com',
+        name: 'New User',
+        password: 'password123',
+        settings: {
+          language: 'en',
+          theme: {
+            type: 'special' as ThemeType,
+            color: 'blue' as ThemeColor,
+          },
+        },
+      };
+
+      const hashedPassword = 'hashed_password123';
+
+      // Mock bcrypt hash to return our expected hashed password
+      (bcrypt.hash as jest.Mock).mockResolvedValueOnce(hashedPassword);
+
+      const createdUser: UserEntity = {
+        ...userData,
+        id: 'new-user-id',
+        password: hashedPassword,
+        createdAt: mockTimestamp,
+        updatedAt: mockTimestamp,
+      };
+
+      mockRepository.create.mockResolvedValue(createdUser);
+
+      // Act
+      const result = await userService.registerUser(userData);
+
+      // Assert
+      expect(mockRepository.create).toHaveBeenCalledWith({
+        ...userData,
+        password: hashedPassword,
+      });
+      expect(result.settings.theme.type).toBe('special');
+      expect(result.settings.theme.color).toBe('blue');
     });
   });
 

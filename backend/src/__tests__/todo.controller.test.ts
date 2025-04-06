@@ -11,7 +11,7 @@ import {
 import {
   createMockRequest,
   createMockResponse,
-  MockUser,
+  defaultTestUser,
 } from './utils/testHelpers';
 
 /**
@@ -30,7 +30,7 @@ describe('TodoController', () => {
     locals: { user: { userId: string; email: string } };
   };
   let mockTodo: TodoEntity;
-  let mockUser: MockUser;
+  let mockUser: typeof defaultTestUser;
 
   const mockTimestamp = Date.now();
   const mockUserId = 'test-user-id';
@@ -68,12 +68,8 @@ describe('TodoController', () => {
 
     // Setup mock user
     mockUser = {
+      ...defaultTestUser,
       userId: mockUserId,
-      email: 'test@example.com',
-      name: 'Test User',
-      settings: {
-        language: 'en',
-      },
     };
 
     // Create a mock Todo for testing

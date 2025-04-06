@@ -13,6 +13,7 @@ import {
   createTodoRouter,
   createAuthRouter,
   createLanguageRouter,
+  createThemeRouter,
 } from './routes';
 import {
   initI18n,
@@ -20,6 +21,7 @@ import {
   setupI18nHelpers,
   changeLanguageMiddleware,
 } from './utils/i18n';
+import { themeMiddleware } from './utils/theme';
 import { currentUrlMiddleware } from './middleware/currentUrl';
 
 // Initialize i18n
@@ -53,6 +55,7 @@ app.use(
 // i18n middleware
 app.use(i18nMiddleware);
 app.use(changeLanguageMiddleware);
+app.use(themeMiddleware);
 app.use(currentUrlMiddleware);
 
 // Set view engine
@@ -84,10 +87,14 @@ app.locals.getContent = function (name: string) {
 // Serve static files from the frontend/public directory
 app.use(express.static(path.join(__dirname, '../../frontend/public')));
 
+// Serve static files from the backend assets directory
+app.use('/assets', express.static(path.join(__dirname, 'assets')));
+
 // Initialize routers
 const todoRouter = createTodoRouter(container.todoController);
 const authRouter = createAuthRouter(container.authController);
 const languageRouter = createLanguageRouter(container.languageController);
+const themeRouter = createThemeRouter(container.themeController);
 
 // Auth middleware to protect routes
 const requireAuth = (
@@ -103,6 +110,9 @@ const requireAuth = (
 
 // Language change route
 app.use('/change-language', languageRouter);
+
+// Theme change route
+app.use('/change-theme', themeRouter);
 
 // Routes
 app.use('/auth', authRouter);

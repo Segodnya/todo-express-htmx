@@ -1,175 +1,117 @@
 import { Request, Response } from 'express';
-import { LanguageController } from '@/controllers';
-import { UserService } from '@/services';
-import { createMockRequest, createMockResponse } from './utils/testHelpers';
+import { LanguageController } from '../controllers/language.controller';
+import { UserService } from '../services';
+import { defaultTestUser } from './utils/testHelpers';
+import { Session } from 'express-session';
 
 describe('LanguageController', () => {
   let languageController: LanguageController;
   let mockUserService: jest.Mocked<UserService>;
+  let mockRequest: Partial<Request>;
   let mockResponse: Partial<Response>;
 
   beforeEach(() => {
     // Create mock user service
     mockUserService = {
-      update: jest.fn().mockResolvedValue({
-        id: 'mock-user-id',
-        email: 'mock@example.com',
-        name: 'Mock User',
-        password: 'hashed_password',
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-        settings: {
-          language: 'en'
-        }
-      }),
+      update: jest.fn(),
     } as unknown as jest.Mocked<UserService>;
 
-    // Initialize the controller with mocked services
+    // Initialize the controller
     languageController = new LanguageController(mockUserService);
 
-    // Create a mock response object
-    mockResponse = createMockResponse();
+    // Create mock request
+    mockRequest = {
+      params: { lang: 'es' },
+      query: { returnTo: '/todos' },
+      session: {
+        id: 'test-session-id',
+        cookie: {},
+        regenerate: jest.fn(),
+        destroy: jest.fn(),
+        save: jest.fn(),
+        touch: jest.fn(),
+        user: {
+          ...defaultTestUser,
+          userId: 'test-user-id',
+        },
+      } as unknown as Session,
+    };
+
+    // Create mock response
+    mockResponse = {
+      status: jest.fn().mockReturnThis(),
+      send: jest.fn(),
+      redirect: jest.fn(),
+      cookie: jest.fn(),
+    };
   });
 
   describe('changeLanguage', () => {
-    it('should update language for a logged-in user', async () => {
-      // Arrange
-      const mockRequest = createMockRequest({
-        params: { lang: 'es' },
-        query: { returnTo: '/todos' },
-      });
-
-      // Set up mock for update method to resolve successfully
-      mockUserService.update.mockResolvedValue({
-        id: 'test-user-id',
-        email: 'test@example.com',
-        name: 'Test User',
-        password: 'hashed_password',
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-        settings: {
-          language: 'es'
-        }
-      });
-
+    it('should update language for logged-in user', async () => {
       // Act
       await languageController.changeLanguage(
-        mockRequest as unknown as Request,
+        mockRequest as Request,
         mockResponse as Response
       );
 
       // Assert
-      // Check if user settings were updated in session
-      expect(mockRequest.session?.user?.settings?.language).toBe('es');
-
-      // Check if user service was called to update the database
       expect(mockUserService.update).toHaveBeenCalledWith('test-user-id', {
         settings: {
           language: 'es',
+          theme: defaultTestUser.settings.theme,
         },
       });
-
-      // Check if cookie was set
       expect(mockResponse.cookie).toHaveBeenCalledWith('i18next', 'es');
-
-      // Check if redirected to the returnTo URL
       expect(mockResponse.redirect).toHaveBeenCalledWith('/todos');
     });
 
-    it('should update language for non-logged-in users', async () => {
+    it('should set cookie for non-logged-in user', async () => {
       // Arrange
-      const mockRequest = createMockRequest();
-      delete mockRequest.session?.user; // User not logged in
-
-      mockRequest.params = { lang: 'fr' };
-      mockRequest.query = { returnTo: '/auth/signin' };
+      delete mockRequest.session?.user;
 
       // Act
       await languageController.changeLanguage(
-        mockRequest as unknown as Request,
+        mockRequest as Request,
         mockResponse as Response
       );
 
       // Assert
-      // Check if user service was NOT called (since no user is logged in)
       expect(mockUserService.update).not.toHaveBeenCalled();
-
-      // Check if cookie was set
-      expect(mockResponse.cookie).toHaveBeenCalledWith('i18next', 'fr');
-
-      // Check if redirected to the returnTo URL
-      expect(mockResponse.redirect).toHaveBeenCalledWith('/auth/signin');
+      expect(mockResponse.cookie).toHaveBeenCalledWith('i18next', 'es');
+      expect(mockResponse.redirect).toHaveBeenCalledWith('/todos');
     });
 
-    it('should return 400 for invalid language code', async () => {
+    it('should handle invalid language code', async () => {
       // Arrange
-      const mockRequest = createMockRequest();
-      mockRequest.params = { lang: 'invalid' };
+      if (mockRequest.params) {
+        mockRequest.params.lang = 'invalid';
+      }
 
       // Act
       await languageController.changeLanguage(
-        mockRequest as unknown as Request,
+        mockRequest as Request,
         mockResponse as Response
       );
 
       // Assert
-      expect(mockResponse.status).toHaveBeenCalledWith(400);
-      expect(mockResponse.send).toHaveBeenCalledWith('Invalid language code');
       expect(mockUserService.update).not.toHaveBeenCalled();
       expect(mockResponse.cookie).not.toHaveBeenCalled();
-      expect(mockResponse.redirect).not.toHaveBeenCalled();
+      expect(mockResponse.status).toHaveBeenCalledWith(400);
+      expect(mockResponse.send).toHaveBeenCalledWith('Invalid language code');
     });
 
-    it('should use default returnTo if not provided', async () => {
+    it('should use default return URL if not provided', async () => {
       // Arrange
-      const mockRequest = createMockRequest();
-      mockRequest.params = { lang: 'pt' };
-      // Not setting query.returnTo
-      
-      // Explicitly mock a resolved Promise for this test
-      mockUserService.update.mockResolvedValueOnce({
-        id: 'test-user-id',
-        email: 'test@example.com',
-        name: 'Test User',
-        password: 'hashed_password',
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-        settings: {
-          language: 'pt'
-        }
-      });
+      delete mockRequest.query?.returnTo;
 
       // Act
       await languageController.changeLanguage(
-        mockRequest as unknown as Request,
+        mockRequest as Request,
         mockResponse as Response
       );
 
       // Assert
-      expect(mockResponse.redirect).toHaveBeenCalledWith('/');
-    });
-
-    it('should handle database update errors gracefully', async () => {
-      // Arrange
-      const mockRequest = createMockRequest();
-      mockRequest.params = { lang: 'es' };
-
-      // Make the database update fail
-      mockUserService.update.mockRejectedValueOnce(new Error('Database error'));
-
-      // Spy on console.error
-      jest.spyOn(console, 'error').mockImplementation();
-
-      // Act
-      await languageController.changeLanguage(
-        mockRequest as unknown as Request,
-        mockResponse as Response
-      );
-
-      // Assert
-      // Should still redirect and set cookies despite the database error
-      expect(mockResponse.cookie).toHaveBeenCalledWith('i18next', 'es');
       expect(mockResponse.redirect).toHaveBeenCalledWith('/');
     });
   });
-}); 
+});

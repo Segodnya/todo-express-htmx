@@ -6,6 +6,18 @@ export interface UserEntity extends BaseEntity {
   password: string;
   settings: {
     language: 'en' | 'es' | 'pt' | 'fr';
+    theme: {
+      type: 'system' | 'light' | 'dark' | 'special';
+      color?:
+        | 'red'
+        | 'orange'
+        | 'green'
+        | 'blue'
+        | 'purple'
+        | 'pink'
+        | 'grey'
+        | 'black';
+    };
   };
 }
 

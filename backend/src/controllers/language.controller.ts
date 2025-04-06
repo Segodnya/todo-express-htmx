@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { UserService } from '../services';
 import { SupportedLanguage } from '../types/i18n';
+import { ThemeType } from '../utils/theme';
 
 export class LanguageController {
   constructor(private userService: UserService) {}
@@ -23,20 +24,29 @@ export class LanguageController {
       req.session.user.settings = {
         ...req.session.user.settings,
         language: lang,
+        theme: req.session.user.settings.theme || {
+          type: 'system' as ThemeType,
+        },
       };
 
       // Then update the database (but don't wait for it to complete)
       try {
         // Only try to update if we have a userId
         if (req.session.user.userId) {
-          const updatePromise = this.userService.update(req.session.user.userId, {
-            settings: {
-              language: lang,
-            },
-          });
+          const updatePromise = this.userService.update(
+            req.session.user.userId,
+            {
+              settings: {
+                language: lang,
+                theme: req.session.user.settings.theme || {
+                  type: 'system' as ThemeType,
+                },
+              },
+            }
+          );
 
           // Handle the promise without blocking
-          updatePromise.catch(error => {
+          updatePromise.catch((error) => {
             console.error('Error updating user language preference:', error);
           });
         }
@@ -51,4 +61,4 @@ export class LanguageController {
     // Redirect back to the original page
     res.redirect(returnTo);
   }
-} 
+}

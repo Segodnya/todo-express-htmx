@@ -6,48 +6,33 @@
     currentUrl: string
 %>
 
-<div class="relative inline-block text-left">
-  <div>
-    <button 
-      type="button" 
-      id="language-menu-button" 
-      aria-expanded="false" 
-      aria-haspopup="true" 
-      class="btn btn-secondary"
-    >
-      <%= t('app.language') %>
-      <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 011.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-      </svg>
-    </button>
-  </div>
+	<div class="relative inline-block text-left"> <div>
+		<button type="button" id="language-menu-button" aria-expanded="false" aria-haspopup="true" class="btn btn-secondary text-light-text dark:text-dark-text transition-colors duration-300">
+			<%= t('app.language') %>
+			<svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewbox="0 0 20 20" fill="currentColor" aria-hidden="true">
+				<path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 011.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+			</svg>
+		</button>
+	</div>
 
-  <div 
-    id="language-menu" 
-    class="menu hidden absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 focus:outline-none z-50" 
-    role="menu" 
-    aria-orientation="vertical" 
-    aria-labelledby="language-menu-button" 
-    tabindex="-1"
-  >
-    <div class="py-1" role="none">
-      <% const languages = [
+	<div id="language-menu" class="menu hidden absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-light-card dark:bg-dark-card ring-1 ring-light-border dark:ring-dark-border ring-opacity-5 divide-y divide-light-border dark:divide-dark-border focus:outline-none z-50 transition-colors duration-300" role="menu" aria-orientation="vertical" aria-labelledby="language-menu-button" tabindex="-1">
+		<div class="py-1" role="none">
+			<% const languages = [
         { code: 'en', label: t('languages.en') },
         { code: 'es', label: t('languages.es') },
         { code: 'pt', label: t('languages.pt') },
         { code: 'fr', label: t('languages.fr') }
       ]; %>
 
-      <% languages.forEach(lang => { %>
-        <a 
-          href="/change-language/<%= lang.code %>?returnTo=<%= encodeURIComponent(locals.currentUrl || '/') %>" 
-          class="block w-full px-4 py-2 text-sm <%= (locals.user?.settings?.language === lang.code || (!locals.user?.settings?.language && locals.language === lang.code)) ? 'bg-gray-100 text-gray-900' : 'text-gray-700 hover:bg-gray-50' %>" 
-          role="menuitem" 
-          tabindex="-1"
-        >
-          <%= lang.label %>
-        </a>
-      <% }); %>
-    </div>
-  </div>
-</div> 
+			<% languages.forEach(lang => { 
+          const isActive = (locals.user?.settings?.language === lang.code || 
+                            (!locals.user?.settings?.language && locals.language === lang.code));
+          const linkClass = `language-menu-item block w-full px-4 py-2 text-sm transition-colors duration-300 ${isActive ? 'language-menu-item-active text-light-text dark:text-dark-text' : 'language-menu-item-inactive text-light-secondary dark:text-dark-secondary hover:bg-light-hover dark:hover:bg-dark-hover'}`;
+      %>
+			<a href="/change-language/<%= lang.code %>?returnTo=<%= encodeURIComponent(locals.currentUrl || '/') %>" class="<%= linkClass %>" role="menuitem" tabindex="-1">
+				<%= lang.label %>
+			</a>
+		<% }); %>
+	</div>
+</div></div>
+

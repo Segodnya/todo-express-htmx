@@ -3,6 +3,7 @@ import { BaseController } from './base.controller';
 import { AuthService } from '../services';
 import { UserCreateDTO, UserLoginDTO, UserSession } from '../types';
 import { ResponseUtils } from '../utils/responseUtils';
+import { ThemeType } from '../utils/theme';
 
 export class AuthController extends BaseController {
   constructor(private authService: AuthService) {
@@ -56,7 +57,10 @@ export class AuthController extends BaseController {
         userId: user.id,
         email: user.email,
         name: user.name,
-        settings: user.settings || { language: 'en' },
+        settings: user.settings || {
+          language: 'en',
+          theme: { type: 'system' as ThemeType },
+        },
       };
 
       this.sendRedirect(res, '/todos');
@@ -90,6 +94,7 @@ export class AuthController extends BaseController {
           password,
           settings: {
             language: userLanguage,
+            theme: { type: 'system' as ThemeType },
           },
         };
         const user = await this.authService.registerUser(userData);

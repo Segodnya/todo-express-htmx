@@ -3,6 +3,7 @@
     "title": "Application de Tâches",
     "loading": "Chargement...",
     "language": "Langue",
+    "theme": "Thème",
     "back": "Retour",
     "save": "Enregistrer",
     "cancel": "Annuler",
@@ -17,10 +18,16 @@
     "pt": "Portugais",
     "fr": "Français"
   },
+  "themes": {
+    "system": "Système",
+    "light": "Clair",
+    "dark": "Sombre",
+    "special": "Spécial"
+  },
   "header": {
     "home": "Accueil",
     "todos": "Tâches",
     "profile": "Profil",
     "logout": "Déconnexion"
   }
-} 
+}

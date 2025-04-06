@@ -4,6 +4,18 @@ import { SupportedLanguage } from './i18n';
 declare namespace Express {
   interface Request {
     language?: SupportedLanguage;
+    theme: {
+      type: 'system' | 'light' | 'dark' | 'special';
+      color?:
+        | 'red'
+        | 'orange'
+        | 'green'
+        | 'blue'
+        | 'purple'
+        | 'pink'
+        | 'grey'
+        | 'black';
+    };
   }
 
   interface Session {
@@ -13,7 +25,19 @@ declare namespace Express {
       name: string;
       settings: {
         language: SupportedLanguage;
+        theme: {
+          type: 'system' | 'light' | 'dark' | 'special';
+          color?:
+            | 'red'
+            | 'orange'
+            | 'green'
+            | 'blue'
+            | 'purple'
+            | 'pink'
+            | 'grey'
+            | 'black';
+        };
       };
     };
   }
-} 
+}

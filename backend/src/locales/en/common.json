@@ -3,6 +3,7 @@
     "title": "Todo App",
     "loading": "Loading...",
     "language": "Language",
+    "theme": "Theme",
     "back": "Back",
     "save": "Save",
     "cancel": "Cancel",
@@ -17,10 +18,16 @@
     "pt": "Portuguese",
     "fr": "French"
   },
+  "themes": {
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark",
+    "special": "Special"
+  },
   "header": {
     "home": "Home",
     "todos": "Todos",
     "profile": "Profile",
     "logout": "Logout"
   }
-} 
+}

@@ -2,7 +2,11 @@ import { Request, Response } from 'express';
 import { AuthController } from '@/controllers';
 import { AuthService } from '@/services';
 import { UserEntity, UserCreateDTO, UserLoginDTO } from '@/types';
-import { createMockRequest, createMockResponse } from './utils/testHelpers';
+import {
+  createMockRequest,
+  createMockResponse,
+  defaultTestUser,
+} from './utils/testHelpers';
 
 /**
  * Type-safe tests for the AuthController
@@ -14,15 +18,11 @@ describe('AuthController', () => {
   let mockResponse: Partial<Response>;
 
   const mockUser: UserEntity = {
+    ...defaultTestUser,
     id: 'user-123',
-    email: 'test@example.com',
-    name: 'Test User',
     password: 'hashed_password123',
     createdAt: Date.now(),
     updatedAt: Date.now(),
-    settings: {
-      language: 'en'
-    }
   };
 
   beforeEach(() => {
@@ -138,9 +138,7 @@ describe('AuthController', () => {
         userId: mockUser.id,
         email: mockUser.email,
         name: mockUser.name,
-        settings: {
-          language: mockUser.settings.language
-        }
+        settings: mockUser.settings,
       });
       // Check HTMX redirect instead of standard redirect
       expect(mockResponse.header).toHaveBeenCalledWith('HX-Redirect', '/todos');
@@ -226,9 +224,6 @@ describe('AuthController', () => {
         id: 'new-user-id',
         email: signupData.email,
         name: signupData.name,
-        settings: {
-          language: 'en'
-        }
       });
 
       // Act
@@ -242,17 +237,13 @@ describe('AuthController', () => {
         name: signupData.name,
         email: signupData.email,
         password: signupData.password,
-        settings: {
-          language: 'en'
-        }
+        settings: defaultTestUser.settings,
       });
       expect(mockRequest.session?.user).toEqual({
         userId: 'new-user-id',
         email: signupData.email,
         name: signupData.name,
-        settings: {
-          language: 'en'
-        }
+        settings: defaultTestUser.settings,
       });
       expect(mockResponse.header).toHaveBeenCalledWith('HX-Redirect', '/todos');
     });

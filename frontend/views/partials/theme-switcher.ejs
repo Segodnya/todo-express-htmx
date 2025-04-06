@@ -1,0 +1,39 @@
+<%# Theme switcher component %>
+<%# 
+  locals:
+    user: { settings?: { theme?: string, themeColor?: string } }
+%>
+
+	<div class="relative inline-block text-left"> <div>
+		<button type="button" id="theme-menu-button" aria-expanded="false" aria-haspopup="true" class="btn btn-secondary text-light-text dark:text-dark-text transition-colors duration-300">
+			<%= t('app.theme') %>
+			<i class="fas fa-chevron-down ml-2"></i>
+		</button>
+	</div>
+
+	<div id="theme-menu" class="menu hidden absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-light-card dark:bg-dark-card ring-1 ring-light-border dark:ring-dark-border ring-opacity-5 divide-y divide-light-border dark:divide-dark-border focus:outline-none z-50 transition-colors duration-300" role="menu" aria-orientation="vertical" aria-labelledby="theme-menu-button" tabindex="-1">
+		<div class="py-1" role="none">
+			<% const themes = [
+        { code: 'system', label: t('themes.system'), icon: 'laptop' },
+        { code: 'light', label: t('themes.light'), icon: 'sun' },
+        { code: 'dark', label: t('themes.dark'), icon: 'moon' },
+        { code: 'special', label: t('themes.special'), icon: 'palette' }
+      ]; %>
+
+			<% themes.forEach(theme => { 
+          const isActive = (locals.user?.settings?.theme === theme.code) || 
+                          (!locals.user?.settings?.theme && theme.code === 'system');
+          
+          // Special handling for the special theme which needs color regeneration
+          const isSpecial = theme.code === 'special';
+          const linkClass = `theme-menu-item block w-full px-4 py-2 text-sm flex items-center transition-colors duration-300 ${isActive ? 'theme-menu-item-active text-light-text dark:text-dark-text' : 'theme-menu-item-inactive text-light-secondary dark:text-dark-secondary hover:bg-light-hover dark:hover:bg-dark-hover'}`;
+          const linkUrl = `/change-theme/${theme.code}${isSpecial && locals.user?.settings?.themeColor ? `?color=${locals.user?.settings?.themeColor}` : ''}`;
+      %>
+			<a href="<%= linkUrl %>" class="<%= linkClass %>" role="menuitem" tabindex="-1" <%= isSpecial ? 'id="special-theme-button"' : '' %>>
+				<i class="fas fa-<%= theme.icon %> h-5 w-5 mr-2"></i>
+				<%= theme.label %>
+			</a>
+		<% }); %>
+	</div>
+</div></div>
+

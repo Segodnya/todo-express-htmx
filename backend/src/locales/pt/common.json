@@ -3,6 +3,7 @@
     "title": "Aplicativo de Tarefas",
     "loading": "Carregando...",
     "language": "Idioma",
+    "theme": "Tema",
     "back": "Voltar",
     "save": "Salvar",
     "cancel": "Cancelar",
@@ -17,10 +18,16 @@
     "pt": "Português",
     "fr": "Francês"
   },
+  "themes": {
+    "system": "Sistema",
+    "light": "Claro",
+    "dark": "Escuro",
+    "special": "Especial"
+  },
   "header": {
     "home": "Início",
     "todos": "Tarefas",
     "profile": "Perfil",
     "logout": "Sair"
   }
-} 
+}

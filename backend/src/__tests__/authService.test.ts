@@ -1,6 +1,7 @@
 import { AuthService } from '@/services';
 import { UserService } from '@/services';
 import { UserEntity, UserCreateDTO, UserLoginDTO } from '@/types';
+import { defaultTestUser } from './utils/testHelpers';
 
 describe('AuthService', () => {
   let authService: AuthService;
@@ -10,15 +11,11 @@ describe('AuthService', () => {
 
   // Sample user for testing
   const mockUser: UserEntity = {
+    ...defaultTestUser,
     id: 'user1',
-    email: 'test@example.com',
-    name: 'Test User',
     password: 'hashed_password123',
     createdAt: mockTimestamp,
     updatedAt: mockTimestamp,
-    settings: {
-      language: 'en'
-    }
   };
 
   beforeEach(() => {
@@ -46,9 +43,7 @@ describe('AuthService', () => {
         email: 'new@example.com',
         name: 'New User',
         password: 'password123',
-        settings: {
-          language: 'en'
-        }
+        settings: defaultTestUser.settings,
       };
 
       const createdUser: UserEntity = {
@@ -77,9 +72,7 @@ describe('AuthService', () => {
         email: 'existing@example.com',
         name: 'Existing User',
         password: 'password123',
-        settings: {
-          language: 'en'
-        }
+        settings: defaultTestUser.settings,
       };
 
       mockUserService.findByEmail.mockResolvedValue(mockUser);

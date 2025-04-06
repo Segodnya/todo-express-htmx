@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { FileUserRepository } from '@/repositories/file/file-user.repository';
 import { UserEntity } from '@/types';
+import { defaultTestUser } from './utils/testHelpers';
 
 // Mock fs module
 jest.mock('fs/promises', () => ({
@@ -19,26 +20,22 @@ describe('FileUserRepository', () => {
   // Sample user data for testing
   const mockUsers: UserEntity[] = [
     {
+      ...defaultTestUser,
       id: 'user1',
       email: 'user1@example.com',
       name: 'User One',
       password: 'hashed_password1',
       createdAt: 1617984000000,
       updatedAt: 1617984000000,
-      settings: {
-        language: 'en'
-      }
     },
     {
+      ...defaultTestUser,
       id: 'user2',
       email: 'user2@example.com',
       name: 'User Two',
       password: 'hashed_password2',
       createdAt: 1617984000000,
       updatedAt: 1617984000000,
-      settings: {
-        language: 'en'
-      }
     },
   ];
 
@@ -143,9 +140,7 @@ describe('FileUserRepository', () => {
         email: 'new@example.com',
         name: 'New User',
         password: 'hashed_newpassword',
-        settings: {
-          language: 'en' as 'en'
-        }
+        settings: defaultTestUser.settings,
       };
 
       // Mock for the write operation
@@ -173,9 +168,7 @@ describe('FileUserRepository', () => {
         email: 'error@example.com',
         name: 'Error User',
         password: 'hashed_password',
-        settings: {
-          language: 'en' as 'en'
-        }
+        settings: defaultTestUser.settings,
       };
 
       // Mock fs.writeFile to throw an error

@@ -2,6 +2,190 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Global styles and transitions */
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Theme-specific styles */
+@layer base {
+  /* Special theme styles applied when .special class is present */
+  .special {
+    /* Background colors */
+    --bg-color: var(--special-background, #ffffff);
+    --text-color: var(--special-text, #1a1a1a);
+    --card-color: var(--special-card, #ffffff);
+    --border-color: var(--special-border, #e5e7eb);
+    --hover-color: var(--special-hover, #f3f4f6);
+    --secondary-color: var(--special-secondary, #6b7280);
+    --accent-color: var(--special-accent, #3b82f6);
+    
+    /* Apply special theme colors */
+    & body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+    }
+    
+    & .card, & .menu {
+      background-color: var(--card-color);
+      border-color: var(--border-color);
+    }
+    
+    /* Button styles */
+    & .btn-primary, & .btnPrimary, & .bg-light-primary-600, & [class*="bg-light-primary"] {
+      background-color: var(--special-primary-600);
+      &:hover {
+        background-color: var(--special-primary-700);
+      }
+      &:focus {
+        --tw-ring-color: var(--special-primary-500);
+      }
+    }
+    
+    /* Dropdown menu styles */
+    & #theme-menu a, & #language-menu a,
+    & .theme-menu-item, & .language-menu-item {
+      &.bg-light-hover, &.dark\:bg-dark-hover, &[class*="bg-light-hover"],
+      &.theme-menu-item-active, &.language-menu-item-active {
+        color: var(--special-primary-800);
+      }
+      
+      &:hover, &.hover\:bg-light-hover:hover, 
+      &[class*="hover:bg-light-hover"]:hover,
+      &.theme-menu-item-inactive:hover, &.language-menu-item-inactive:hover {
+        background-color: var(--special-primary-50);
+        color: var(--special-primary-700);
+      }
+    }
+    
+    /* Link styles */
+    & a[class*="text-light-primary"], & a.text-light-primary-600, & a[class*="text-dark-primary"] {
+      color: var(--special-primary-600);
+      transition: color 0.3s ease;
+      
+      &:hover {
+        color: var(--special-primary-500);
+      }
+    }
+    
+    /* Default link styling for links without specific classes */
+    & a:not([class]), & a.link {
+      color: var(--special-primary-600);
+      transition: color 0.3s ease;
+      
+      &:hover {
+        color: var(--special-primary-500);
+      }
+    }
+    
+    /* Border styles */
+    & .border-light-border, & .divide-light-border > * + *, & [class*="border-light"] {
+      border-color: var(--border-color);
+    }
+    
+    /* Hover effects */
+    & .hover\:bg-light-hover:hover, & [class*="hover:bg-light"]:hover {
+      background-color: var(--hover-color);
+    }
+    
+    /* Text colors */
+    & .text-light-secondary, & .text-dark-secondary, & [class*="text-light-secondary"], & [class*="text-dark-secondary"] {
+      color: var(--secondary-color);
+    }
+    
+    & .text-light-text, & .text-dark-text, & [class*="text-light-text"], & [class*="text-dark-text"] {
+      color: var(--text-color);
+    }
+    
+    /* Primary text colors */
+    & .text-light-primary-600, & .text-dark-primary-600, 
+    & [class*="text-light-primary"], & [class*="text-dark-primary"] {
+      color: var(--special-primary-600);
+    }
+    
+    & .hover\:text-light-primary-500:hover, & .hover\:text-dark-primary-500:hover,
+    & [class*="hover:text-light-primary"]:hover, & [class*="hover:text-dark-primary"]:hover {
+      color: var(--special-primary-500);
+    }
+
+    /* Input focus styles */
+    & .focus\:ring-light-accent:focus, & .focus\:border-light-accent:focus, 
+    & .focus\:ring-light-primary-500:focus, & .focus\:border-light-primary-500:focus,
+    & [class*="focus:ring-light"]:focus, & [class*="focus:border-light"]:focus {
+      --tw-ring-color: var(--special-primary-500);
+      border-color: var(--special-primary-500);
+    }
+
+    /* Form elements */
+    & input[type="checkbox"], & input[type="radio"] {
+      color: var(--special-primary-600);
+      &:checked {
+        background-color: var(--special-primary-600);
+        border-color: var(--special-primary-600);
+      }
+      &:focus {
+        --tw-ring-color: var(--special-primary-500);
+      }
+    }
+    
+    /* Custom effect for theme menu items */
+    & #theme-menu {
+      background-color: var(--card-color);
+      border-color: var(--border-color);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    
+    & #special-theme-button {
+      position: relative;
+      
+      &:after {
+        content: "";
+        display: block;
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: var(--special-color, var(--accent-color));
+        box-shadow: 0 0 6px var(--special-color, var(--accent-color));
+      }
+    }
+  }
+}
+
+/* Global dropdown menu styles for all themes */
+.light .theme-menu-item-active, 
+.light .language-menu-item-active {
+  /* background-color: theme('colors.light.primary.100'); */
+  background-color: var(--special-primary-100);
+  color: theme('colors.light.primary.800');
+}
+
+.light .theme-menu-item-inactive:hover, 
+.light .language-menu-item-inactive:hover {
+  background-color: theme('colors.light.primary.50');
+  color: theme('colors.light.primary.700');
+}
+
+.dark .theme-menu-item-active, 
+.dark .language-menu-item-active {
+  /* background-color: theme('colors.dark.primary.900'); */
+  background-color: var(--special-primary-900);
+  color: theme('colors.dark.primary.300');
+}
+
+.dark .theme-menu-item-inactive:hover, 
+.dark .language-menu-item-inactive:hover {
+  background-color: theme('colors.dark.primary.950');
+  color: theme('colors.dark.primary.400');
+}
+
 /* Custom CSS that doesn't fit into the Tailwind config */
 .htmx-indicator {
   display: none;
@@ -22,4 +206,30 @@
 /* Loading animation */
 .loading {
   @apply animate-spin;
+}
+
+/* Theme icon styles */
+.fas {
+  display: inline-block;
+  width: 1.25rem;
+  text-align: center;
+}
+
+/* Special theme color indicator for the theme switcher menu */
+#theme-menu .fas.fa-palette {
+  position: relative;
+}
+
+#theme-menu .fas.fa-palette:after {
+  content: "";
+  display: block;
+  position: absolute;
+  right: -4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--special-color, #3b82f6);
+  box-shadow: 0 0 4px var(--special-color, #3b82f6);
 } 

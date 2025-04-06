@@ -28,7 +28,7 @@
 %>
 <div>
   <% if (inputLabel) { %>
-    <label for="<%= id %>" class="formLabel">
+    <label for="<%= id %>" class="formLabel transition-colors duration-300">
       <%= inputLabel %>
     </label>
   <% } %>
@@ -39,7 +39,7 @@
       type="<%= inputType %>" 
       <% if (isRequired) { %>required<% } %>
       <% if (inputPlaceholder) { %>placeholder="<%= inputPlaceholder %>"<% } %>
-      class="formInput"
+      class="formInput transition-colors duration-300"
       <% Object.entries(htmlAttrs).forEach(([key, value]) => { %>
         <%= key %>="<%= value %>"
       <% }); %>
