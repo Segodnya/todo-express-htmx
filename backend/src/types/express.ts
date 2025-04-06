@@ -5,6 +5,9 @@ export interface UserSession {
   userId: string;
   email: string;
   name: string;
+  settings: {
+    language: 'en' | 'es' | 'pt' | 'fr';
+  };
 }
 
 // Define session augmentation

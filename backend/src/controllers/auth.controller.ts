@@ -56,6 +56,7 @@ export class AuthController extends BaseController {
         userId: user.id,
         email: user.email,
         name: user.name,
+        settings: user.settings || { language: 'en' },
       };
 
       this.sendRedirect(res, '/todos');
@@ -77,7 +78,20 @@ export class AuthController extends BaseController {
       }
 
       try {
-        const userData: UserCreateDTO = { name, email, password };
+        // Get browser language or use default
+        let userLanguage: 'en' | 'es' | 'pt' | 'fr' = 'en';
+        if (req.language && ['en', 'es', 'pt', 'fr'].includes(req.language)) {
+          userLanguage = req.language as 'en' | 'es' | 'pt' | 'fr';
+        }
+
+        const userData: UserCreateDTO = {
+          name,
+          email,
+          password,
+          settings: {
+            language: userLanguage,
+          },
+        };
         const user = await this.authService.registerUser(userData);
 
         // Set session with the type expected by UserSession
@@ -85,6 +99,7 @@ export class AuthController extends BaseController {
           userId: user.id,
           email: user.email,
           name: user.name,
+          settings: user.settings,
         };
 
         this.sendRedirect(res, '/todos');

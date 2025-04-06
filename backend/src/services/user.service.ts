@@ -15,26 +15,34 @@ export class UserService extends BaseService<UserEntity> {
   async registerUser(userData: UserCreateDTO): Promise<UserEntity> {
     // Hash the password before storing
     const hashedPassword = await this.hashPassword(userData.password);
-    
-    return this.create({
+
+    // Set default language settings if not provided
+    const userDataWithSettings = {
       ...userData,
       password: hashedPassword,
-    });
+      settings: userData.settings || {
+        language: 'en', // Default to English
+      },
+    };
+
+    return this.create(userDataWithSettings);
   }
 
-  async authenticateUser(credentials: UserLoginDTO): Promise<UserEntity | null> {
+  async authenticateUser(
+    credentials: UserLoginDTO
+  ): Promise<UserEntity | null> {
     const user = await this.userRepository.findByEmail(credentials.email);
-    
+
     if (!user) {
       return null;
     }
-    
+
     // Compare the provided password with the stored hash
     const isPasswordValid = await this.comparePassword(
       credentials.password,
       user.password
     );
-    
+
     return isPasswordValid ? user : null;
   }
 
@@ -49,4 +57,4 @@ export class UserService extends BaseService<UserEntity> {
   ): Promise<boolean> {
     return bcrypt.compare(password, hashedPassword);
   }
-} 
+}

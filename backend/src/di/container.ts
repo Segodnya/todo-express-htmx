@@ -13,7 +13,8 @@ import {
 
 import { 
   TodoController, 
-  AuthController 
+  AuthController,
+  LanguageController
 } from '../controllers';
 
 interface Container {
@@ -29,6 +30,7 @@ interface Container {
   // Controllers
   todoController: TodoController;
   authController: AuthController;
+  languageController: LanguageController;
 }
 
 // Initialize all dependencies and wire them together
@@ -45,6 +47,7 @@ export function createContainer(): Container {
   // Controllers
   const todoController = new TodoController(todoService);
   const authController = new AuthController(authService);
+  const languageController = new LanguageController(userService);
   
   return {
     // Repositories
@@ -58,6 +61,7 @@ export function createContainer(): Container {
     
     // Controllers
     todoController,
-    authController
+    authController,
+    languageController
   };
 } 

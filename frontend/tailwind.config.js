@@ -1,7 +1,26 @@
 module.exports = {
-  content: ['./views/**/*.ejs'],
+  content: [
+    './views/**/*.ejs',
+    './src/js/**/*.js', // Include JavaScript files for class extraction
+  ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        primary: {
+          50: '#f0f9ff',
+          100: '#e0f2fe',
+          200: '#bae6fd',
+          300: '#7dd3fc',
+          400: '#38bdf8',
+          500: '#0ea5e9',
+          600: '#0284c7',
+          700: '#0369a1',
+          800: '#075985',
+          900: '#0c4a6e',
+          950: '#082f49',
+        },
+      },
+    },
   },
   plugins: [
     require('@tailwindcss/forms'),
@@ -38,6 +57,20 @@ module.exports = {
         '.listItem': {
           '@apply px-4 py-4 flex items-center justify-between space-x-3 hover:bg-gray-50':
             {},
+        },
+        // Menu styles for language switcher
+        '.menu': {
+          '@apply origin-top-right rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 focus:outline-none':
+            {},
+        },
+        '.menu-item': {
+          '@apply block w-full px-4 py-2 text-sm': {},
+        },
+        '.menu-item-active': {
+          '@apply bg-gray-100 text-gray-900': {},
+        },
+        '.menu-item-inactive': {
+          '@apply text-gray-700 hover:bg-gray-50': {},
         },
       });
     },

@@ -20,6 +20,9 @@ describe('AuthController', () => {
     password: 'hashed_password123',
     createdAt: Date.now(),
     updatedAt: Date.now(),
+    settings: {
+      language: 'en'
+    }
   };
 
   beforeEach(() => {
@@ -135,6 +138,9 @@ describe('AuthController', () => {
         userId: mockUser.id,
         email: mockUser.email,
         name: mockUser.name,
+        settings: {
+          language: mockUser.settings.language
+        }
       });
       // Check HTMX redirect instead of standard redirect
       expect(mockResponse.header).toHaveBeenCalledWith('HX-Redirect', '/todos');
@@ -220,6 +226,9 @@ describe('AuthController', () => {
         id: 'new-user-id',
         email: signupData.email,
         name: signupData.name,
+        settings: {
+          language: 'en'
+        }
       });
 
       // Act
@@ -233,11 +242,17 @@ describe('AuthController', () => {
         name: signupData.name,
         email: signupData.email,
         password: signupData.password,
+        settings: {
+          language: 'en'
+        }
       });
       expect(mockRequest.session?.user).toEqual({
         userId: 'new-user-id',
         email: signupData.email,
         name: signupData.name,
+        settings: {
+          language: 'en'
+        }
       });
       expect(mockResponse.header).toHaveBeenCalledWith('HX-Redirect', '/todos');
     });

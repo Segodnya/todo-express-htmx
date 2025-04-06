@@ -25,6 +25,9 @@ describe('FileUserRepository', () => {
       password: 'hashed_password1',
       createdAt: 1617984000000,
       updatedAt: 1617984000000,
+      settings: {
+        language: 'en'
+      }
     },
     {
       id: 'user2',
@@ -33,6 +36,9 @@ describe('FileUserRepository', () => {
       password: 'hashed_password2',
       createdAt: 1617984000000,
       updatedAt: 1617984000000,
+      settings: {
+        language: 'en'
+      }
     },
   ];
 
@@ -137,6 +143,9 @@ describe('FileUserRepository', () => {
         email: 'new@example.com',
         name: 'New User',
         password: 'hashed_newpassword',
+        settings: {
+          language: 'en' as 'en'
+        }
       };
 
       // Mock for the write operation
@@ -164,6 +173,9 @@ describe('FileUserRepository', () => {
         email: 'error@example.com',
         name: 'Error User',
         password: 'hashed_password',
+        settings: {
+          language: 'en' as 'en'
+        }
       };
 
       // Mock fs.writeFile to throw an error

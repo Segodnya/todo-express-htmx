@@ -31,6 +31,9 @@ describe('UserService', () => {
     password: 'hashed_password123',
     createdAt: mockTimestamp,
     updatedAt: mockTimestamp,
+    settings: {
+      language: 'en'
+    }
   };
 
   beforeEach(() => {
@@ -84,6 +87,9 @@ describe('UserService', () => {
         email: 'new@example.com',
         name: 'New User',
         password: 'password123',
+        settings: {
+          language: 'en'
+        }
       };
 
       const hashedPassword = 'hashed_password123';

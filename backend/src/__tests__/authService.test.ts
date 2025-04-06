@@ -16,6 +16,9 @@ describe('AuthService', () => {
     password: 'hashed_password123',
     createdAt: mockTimestamp,
     updatedAt: mockTimestamp,
+    settings: {
+      language: 'en'
+    }
   };
 
   beforeEach(() => {
@@ -43,6 +46,9 @@ describe('AuthService', () => {
         email: 'new@example.com',
         name: 'New User',
         password: 'password123',
+        settings: {
+          language: 'en'
+        }
       };
 
       const createdUser: UserEntity = {
@@ -71,6 +77,9 @@ describe('AuthService', () => {
         email: 'existing@example.com',
         name: 'Existing User',
         password: 'password123',
+        settings: {
+          language: 'en'
+        }
       };
 
       mockUserService.findByEmail.mockResolvedValue(mockUser);

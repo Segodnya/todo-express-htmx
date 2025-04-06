@@ -31,6 +31,7 @@
 <button 
   type="<%= buttonType %>" 
   class="btn <%= buttonVariant === 'danger' ? 'bttnDanger' : 'btnPrimary' %> <%= isFullWidth ? 'w-full' : '' %>"
+  <%= isLoading ? 'data-loading="true"' : '' %>
   <%_ Object.entries(htmlAttrs).forEach(([key, value]) => { _%>
     <%= key %>="<%= value %>"
   <%_ }); _%>

@@ -1,0 +1,26 @@
+{
+  "app": {
+    "title": "Application de Tâches",
+    "loading": "Chargement...",
+    "language": "Langue",
+    "back": "Retour",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "error": "Erreur",
+    "success": "Succès"
+  },
+  "languages": {
+    "en": "Anglais",
+    "es": "Espagnol",
+    "pt": "Portugais",
+    "fr": "Français"
+  },
+  "header": {
+    "home": "Accueil",
+    "todos": "Tâches",
+    "profile": "Profil",
+    "logout": "Déconnexion"
+  }
+} 

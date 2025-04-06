@@ -4,8 +4,11 @@ export interface UserEntity extends BaseEntity {
   email: string;
   name: string;
   password: string;
+  settings: {
+    language: 'en' | 'es' | 'pt' | 'fr';
+  };
 }
 
 export type UserCreateDTO = Omit<UserEntity, 'id' | 'createdAt' | 'updatedAt'>;
 
-export type UserLoginDTO = Pick<UserEntity, 'email' | 'password'>; 
+export type UserLoginDTO = Pick<UserEntity, 'email' | 'password'>;

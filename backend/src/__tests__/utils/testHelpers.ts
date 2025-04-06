@@ -10,6 +10,9 @@ export interface MockUser {
   userId: string;
   email: string;
   name: string;
+  settings: {
+    language: 'en' | 'es' | 'pt' | 'fr';
+  };
 }
 
 /**
@@ -35,6 +38,9 @@ export const createMockRequest = (
     userId: 'test-user-id',
     email: 'test@example.com',
     name: 'Test User',
+    settings: {
+      language: 'en'
+    }
   };
 
   // Create a session object with the minimum required properties for testing
@@ -93,6 +99,7 @@ export const createMockResponse = (): Partial<Response> => {
   res.header = jest.fn().mockReturnValue(res);
   res.setHeader = jest.fn().mockReturnValue(res);
   res.end = jest.fn().mockReturnValue(res);
+  res.cookie = jest.fn().mockReturnValue(res);
 
   return res;
 };

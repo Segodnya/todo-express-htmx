@@ -1,0 +1,12 @@
+[
+  {
+    "email": "aa@aa.com",
+    "password": "$2b$10$/UoxWD3bTLpuqMgp4Z5HL.UzfAqjgcIbC7oCFXwRg.RDWpsMfShmW",
+    "createdAt": "2025-04-05T12:17:32.032Z",
+    "updatedAt": 1743928393776,
+    "id": "6cnwyd4v5pj",
+    "settings": {
+      "language": "en"
+    }
+  }
+]

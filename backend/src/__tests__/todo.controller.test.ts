@@ -71,6 +71,9 @@ describe('TodoController', () => {
       userId: mockUserId,
       email: 'test@example.com',
       name: 'Test User',
+      settings: {
+        language: 'en',
+      },
     };
 
     // Create a mock Todo for testing

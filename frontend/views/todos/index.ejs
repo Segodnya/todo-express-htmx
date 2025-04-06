@@ -15,16 +15,16 @@
                             label: '',
                             type: 'text',
                             required: true,
-                            placeholder: 'What needs to be done?'
+                            placeholder: t('todos:add.placeholder')
                         }) %>
                     </div>
                     <div class="ml-3 flex-shrink-0">
                         <%- include('../partials/button', {
                             type: 'submit',
                             variant: 'primary',
-                            content: 'Add Todo',
+                            content: t('todos:add.button'),
                             loading: true,
-                            loadingText: 'Adding...'
+                            loadingText: t('todos:add.loading')
                         }) %>
                     </div>
                 </div>
@@ -33,9 +33,13 @@
 
         <!-- Todo List -->
         <ul id="todo-list" class="listContainer">
-            <% todos?.forEach(function(todo) { %>
-                <%- include('../partials/todo-item', { todo }) %>
-            <% }); %>
+            <% if (!todos || todos.length === 0) { %>
+                <li class="p-4 text-center text-gray-500"><%= t('todos:empty') %></li>
+            <% } else { %>
+                <% todos?.forEach(function(todo) { %>
+                    <%- include('../partials/todo-item', { todo }) %>
+                <% }); %>
+            <% } %>
         </ul>
     </div>
 </div>
