@@ -23,10 +23,13 @@ Simple Full-Stack To-do App w/ Express, Mongo, HTMX
 
 ## Theme Switching - Plan
 
+0. Preparations: extract all the hardcode colors from views, backend HTMX-markup and styles into theme variables in the tailwind config
+   - Create a list of themes based on the variables: light, dark, special (light one with acceent colors - red, orange, green, blue, purple, pink, grey, black)
 1. Add 'theme' property to user's settings object (type: system, light, dark, special; special should have an extra 'color' property to store the chosen accent random color).
 2. We will store theme in a browser localStorage and in the server's user object
 3. Update backend infrastructure to work with changing theme property:
-   - Create a ThemeController similar to the LanguageController
+   - Create a ThemeController similar to the LanguageController. Maybe we should create a common SettingsController that will take a case (lang, theme)
+   - Create repository, service for the Settings logic (if needed).
    - Add a route for theme switching (/change-theme/:theme)
    - Implement middleware to apply theme settings on request
 4. Update test infrastructure to be able to check the new functionality:
@@ -48,3 +51,7 @@ Simple Full-Stack To-do App w/ Express, Mongo, HTMX
     - Ensure generated colors maintain proper contrast ratios for accessibility
     - Create helper functions to derive complementary colors for UI elements
     - Apply color theory principles to generate a cohesive palette
+12. There should be a background image for the app if a special theme is selected based oon the color:
+   - Images are stored on the server
+   - There is a spinner until the background image is loaded
+   - Background is blurred with css mask (tailwind)
