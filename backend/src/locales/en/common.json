@@ -1,0 +1,33 @@
+{
+  "app": {
+    "title": "Todo App",
+    "loading": "Loading...",
+    "language": "Language",
+    "theme": "Theme",
+    "back": "Back",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "error": "Error",
+    "success": "Success"
+  },
+  "languages": {
+    "en": "English",
+    "es": "Spanish",
+    "pt": "Portuguese",
+    "fr": "French"
+  },
+  "themes": {
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark",
+    "special": "Special"
+  },
+  "header": {
+    "home": "Home",
+    "todos": "Todos",
+    "profile": "Profile",
+    "logout": "Logout"
+  }
+}

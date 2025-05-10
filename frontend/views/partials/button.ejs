@@ -1,0 +1,51 @@
+<%# 
+  Params:
+  - type: button type (submit, button)
+  - variant: primary, danger (defaults to primary)
+  - fullWidth: whether button should take full width (defaults to false)
+  - loading: whether to show loading state (defaults to false)
+  - loadingText: text to show while loading (defaults to 'Loading...')
+  - content: button text content
+  - Any other HTML attributes will be passed through (e.g., hx-* attributes)
+%>
+<% 
+  // Set default values for optional parameters
+  const buttonType = type || 'button';
+  const buttonVariant = variant || 'primary';
+  const isFullWidth = typeof fullWidth !== 'undefined' ? fullWidth : false;
+  const isLoading = typeof loading !== 'undefined' ? loading : false;
+  const buttonLoadingText = loadingText || 'Loading...';
+
+  // Filter out known props and non-string values to get remaining HTML attributes
+  const htmlAttrs = Object.entries(locals)
+    .filter(([key, value]) => (
+      !['type', 'variant', 'fullWidth', 'loading', 'loadingText', 'content', 'settings', '_locals'].includes(key) &&
+      typeof value !== 'object' &&
+      typeof value !== 'function'
+    ))
+    .reduce((acc, [key, value]) => {
+      acc[key] = value;
+      return acc;
+    }, {});
+%>
+<button 
+  type="<%= buttonType %>" 
+  class="btn <%= buttonVariant === 'danger' ? 'bttnDanger' : 'btnPrimary' %> <%= isFullWidth ? 'w-full' : '' %>"
+  <%= isLoading ? 'data-loading="true"' : '' %>
+  <%_ Object.entries(htmlAttrs).forEach(([key, value]) => { _%>
+    <%= key %>="<%= value %>"
+  <%_ }); _%>
+>
+  <% if (isLoading) { %>
+    <span class="htmx-indicator hidden">
+      <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <%= buttonLoadingText %>
+    </span>
+  <% } %>
+  <span class="<%= isLoading ? 'htmx-request-element' : '' %>">
+    <%= content %>
+  </span>
+</button> 

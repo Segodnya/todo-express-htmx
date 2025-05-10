@@ -1,0 +1,16 @@
+{
+  "title": "Lista de Tareas",
+  "add": {
+    "placeholder": "¿Qué necesitas hacer?",
+    "button": "Añadir Tarea",
+    "loading": "Añadiendo..."
+  },
+  "empty": "No hay tareas todavía. ¡Añade algunas!",
+  "completed": "Completada",
+  "incomplete": "Incompleta",
+  "markCompleted": "Marcar como completada",
+  "markIncomplete": "Marcar como incompleta",
+  "delete": "Eliminar Tarea",
+  "deleteConfirm": "¿Estás seguro de que quieres eliminar esta tarea?",
+  "edit": "Editar Tarea"
+} 

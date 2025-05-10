@@ -1,0 +1,27 @@
+<!-- todo-item.ejs -->
+<%# 
+  Params:
+  - todo: Todo object with id, text, and completed properties
+%>
+	<% if (!todo) return; %>
+		<li class="listItem transition-colors duration-300" id="todo-<%= todo.id %>"> <div class="flex items-center min-w-0 flex-1">
+			<input type="checkbox" <%= todo.completed ? 'checked' : '' %> hx-put="/todos/<%= todo.id %>/toggle" hx-target="#todo-<%= todo.id %>" hx-swap="outerHTML" title="<%= todo.completed ? t('todos:markIncomplete') : t('todos:markCompleted') %>" class="h-4 w-4 text-light-primary-600 dark:text-dark-primary-600 focus:ring-light-primary-500 dark:focus:ring-dark-primary-500 border-light-border dark:border-dark-border rounded transition-colors duration-300">
+			<span class="ml-3 block truncate <%= todo.completed ? 'line-through text-light-secondary dark:text-dark-secondary' : 'text-light-text dark:text-dark-text' %> transition-colors duration-300">
+				<%= todo.text %>
+			</span>
+		</div>
+		<div class="flex-shrink-0">
+			<%- include('./button', {
+      type: 'button',
+      variant: 'danger',
+      content: t('todos:delete'),
+      loading: false,
+      loadingText: t('app.loading'),
+      fullWidth: false,
+      'hx-delete': `/todos/${todo.id}`,
+      'hx-target': '#todo-' + todo.id,
+      'hx-swap': 'outerHTML',
+      'hx-confirm': t('todos:deleteConfirm')
+    }) %>
+		</div>
+	</li>

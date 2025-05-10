@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Todo App</title>
+
+		<!-- Font Awesome -->
+		<link
+		rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer"/>
+
+		<!-- HTMX -->
+		<script src="https://unpkg.com/htmx.org@1.9.10"></script>
+		<!-- Bundled App JavaScript -->
+		<script type="module" src="/js/main.js" defer></script>
+		<!-- Tailwind CSS -->
+		<link href="/css/output.css" rel="stylesheet">
+	</head>
+	<body
+		data-authenticated="<%= locals.user ? 'true' : 'false' %>" class="bg-light-background dark:bg-dark-background text-light-text dark:text-dark-text transition-colors duration-300">
+		<!-- Special theme background image container -->
+		<div
+			id="theme-background-container" class="fixed inset-0 z-0 bg-cover bg-center opacity-0 transition-opacity duration-500" style="display: none;">
+			<!-- Loading spinner for background image -->
+			<div id="background-loading-spinner" class="fixed inset-0 flex items-center justify-center z-10">
+				<div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-light-primary-600 dark:border-dark-primary-600"></div>
+			</div>
+			<!-- Background image overlay with blur -->
+			<div class="absolute inset-0 bg-black/20 backdrop-blur-sm"></div>
+		</div>
+
+		<!-- Loading indicator -->
+		<div class="htmx-indicator fixed top-0 left-0 right-0 z-50">
+			<div class="bg-light-primary-600 dark:bg-dark-primary-600 h-1 w-full animate-pulse"></div>
+		</div>
+
+		<!-- Main Content -->
+		<main class="container mx-auto px-4 py-8 relative z-10">
+

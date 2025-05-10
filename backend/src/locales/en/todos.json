@@ -1,0 +1,16 @@
+{
+  "title": "Todo List",
+  "add": {
+    "placeholder": "What needs to be done?",
+    "button": "Add Todo",
+    "loading": "Adding..."
+  },
+  "empty": "No todos yet. Add some!",
+  "completed": "Completed",
+  "incomplete": "Incomplete",
+  "markCompleted": "Mark as completed",
+  "markIncomplete": "Mark as incomplete",
+  "delete": "Delete Todo",
+  "deleteConfirm": "Are you sure you want to delete this todo?",
+  "edit": "Edit Todo"
+}

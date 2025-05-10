@@ -1,0 +1,16 @@
+{
+  "title": "Liste de Tâches",
+  "add": {
+    "placeholder": "Qu'est-ce qui doit être fait?",
+    "button": "Ajouter une Tâche",
+    "loading": "Ajout en cours..."
+  },
+  "empty": "Pas encore de tâches. Ajoutez-en!",
+  "completed": "Terminée",
+  "incomplete": "Incomplète",
+  "markCompleted": "Marquer comme terminée",
+  "markIncomplete": "Marquer comme incomplète",
+  "delete": "Supprimer la Tâche",
+  "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cette tâche?",
+  "edit": "Modifier la Tâche"
+} 

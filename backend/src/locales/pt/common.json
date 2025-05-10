@@ -1,0 +1,33 @@
+{
+  "app": {
+    "title": "Aplicativo de Tarefas",
+    "loading": "Carregando...",
+    "language": "Idioma",
+    "theme": "Tema",
+    "back": "Voltar",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "error": "Erro",
+    "success": "Sucesso"
+  },
+  "languages": {
+    "en": "Inglês",
+    "es": "Espanhol",
+    "pt": "Português",
+    "fr": "Francês"
+  },
+  "themes": {
+    "system": "Sistema",
+    "light": "Claro",
+    "dark": "Escuro",
+    "special": "Especial"
+  },
+  "header": {
+    "home": "Início",
+    "todos": "Tarefas",
+    "profile": "Perfil",
+    "logout": "Sair"
+  }
+}

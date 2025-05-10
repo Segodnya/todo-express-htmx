@@ -1,0 +1,33 @@
+{
+  "app": {
+    "title": "Aplicación de Tareas",
+    "loading": "Cargando...",
+    "language": "Idioma",
+    "theme": "Tema",
+    "back": "Volver",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "error": "Error",
+    "success": "Éxito"
+  },
+  "languages": {
+    "en": "Inglés",
+    "es": "Español",
+    "pt": "Portugués",
+    "fr": "Francés"
+  },
+  "themes": {
+    "system": "Sistema",
+    "light": "Claro",
+    "dark": "Oscuro",
+    "special": "Especial"
+  },
+  "header": {
+    "home": "Inicio",
+    "todos": "Tareas",
+    "profile": "Perfil",
+    "logout": "Cerrar sesión"
+  }
+}

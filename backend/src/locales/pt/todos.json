@@ -1,0 +1,16 @@
+{
+  "title": "Lista de Tarefas",
+  "add": {
+    "placeholder": "O que precisa ser feito?",
+    "button": "Adicionar Tarefa",
+    "loading": "Adicionando..."
+  },
+  "empty": "Nenhuma tarefa ainda. Adicione algumas!",
+  "completed": "Concluída",
+  "incomplete": "Incompleta",
+  "markCompleted": "Marcar como concluída",
+  "markIncomplete": "Marcar como incompleta",
+  "delete": "Excluir Tarefa",
+  "deleteConfirm": "Tem certeza que deseja excluir esta tarefa?",
+  "edit": "Editar Tarefa"
+} 

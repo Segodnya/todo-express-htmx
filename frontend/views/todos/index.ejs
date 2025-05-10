@@ -1,0 +1,45 @@
+<%- include('../layouts/header') %>
+
+<div class="max-w-4xl mx-auto">
+	<div
+		class="card transition-colors duration-300">
+		<!-- Add Todo Form -->
+		<div class="cardSection border-b border-light-border dark:border-dark-border transition-colors duration-300">
+			<form class="mt-4" hx-post="/todos" hx-target="#todo-list" hx-swap="beforeend">
+				<div class="flex rounded-md shadow-sm">
+					<div class="flex-1">
+						<%- include('../partials/form-input', {
+                            id: 'text',
+                            label: '',
+                            type: 'text',
+                            required: true,
+                            placeholder: t('todos:add.placeholder')
+                        }) %>
+					</div>
+					<div class="ml-3 flex-shrink-0">
+						<%- include('../partials/button', {
+                            type: 'submit',
+                            variant: 'primary',
+                            content: t('todos:add.button'),
+                            loading: true,
+                            loadingText: t('todos:add.loading')
+                        }) %>
+					</div>
+				</div>
+			</form>
+		</div>
+
+		<!-- Todo List -->
+		<ul id="todo-list" class="listContainer transition-colors duration-300">
+			<% if (!todos || todos.length === 0) { %>
+				<li class="p-4 text-center text-light-secondary dark:text-dark-secondary transition-colors duration-300"><%= t('todos:empty') %></li>
+			<% } else { %>
+				<% todos?.forEach(function(todo) { %>
+					<%- include('../partials/todo-item', { todo }) %>
+				<% }); %>
+			<% } %>
+		</ul>
+	</div>
+</div>
+
+<%- include('../layouts/footer') %>
